@@ -3,37 +3,60 @@ package com.asta.service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.asta.dto.CreaAstaRequest;
+import com.asta.dto.OffertaDTO;
 import com.asta.entity.Asta;
+import com.asta.entity.Offerta;
 import com.asta.mapper.AstaMapper;
+import com.asta.mapper.OffertaMapper;
 import com.item.entity.Item;
 import com.item.mapper.ItemMapper;
+import com.login.entity.Utente;
+import com.login.mapper.UtenteMapper;
 
 @Service
 public class AstaService {
 
 	private final AstaMapper astaMapper;
 	private final ItemMapper itemMapper;
+	private final OffertaMapper offertaMapper;
+	private final UtenteMapper utenteMapper;
 	LocalDateTime now = LocalDateTime.now();
 
 	public List<Asta> getAsteAttive() {
-		return astaMapper.findAsteAttive();
+	    List<Asta> asteAttive = astaMapper.findAsteAttive();
+
+	    for (Asta asta : asteAttive) {
+	        // Se esiste un'asta con un'offerta corrente, recupera l'username dell'utente
+	        if (asta.getOffertaCorrenteId() != null) {
+	            Utente offerente = utenteMapper.findById(asta.getOffertaCorrenteId());
+	            if (offerente != null) {
+	                asta.setUsernameOfferente(offerente.getUsername());
+	            }
+	        }
+	    }
+
+	    return asteAttive;
 	}
 
-	public AstaService(AstaMapper astaMapper, ItemMapper itemMapper) {
+	public AstaService(AstaMapper astaMapper, ItemMapper itemMapper, OffertaMapper offertaMapper,
+			UtenteMapper utenteMapper) {
 		this.astaMapper = astaMapper;
 		this.itemMapper = itemMapper;
+		this.offertaMapper = offertaMapper;
+		this.utenteMapper = utenteMapper;
 	}
 
 	public Asta findById(Long id) {
 		return astaMapper.findById(id);
 	}
 
-	////28/12/2024 Simone CREAZIONE ASTA 1)
+	//// 28/12/2024 Simone CREAZIONE ASTA 1)
 	@Transactional
 	public Asta createAsta(CreaAstaRequest request, Long gestoreId) {
 		System.out.println("Request ricevuta: " + request.getItemId());
@@ -82,7 +105,7 @@ public class AstaService {
 
 	}
 
-	//28/12/2024 Simone TUTTE LE VALIDAZIONI NECESSARIE 2)
+	// 28/12/2024 Simone TUTTE LE VALIDAZIONI NECESSARIE 2)
 	private void validateAstaRequest(CreaAstaRequest request) {
 		if (!request.isStartNow() && request.getDataInizio() == null) {
 			throw new IllegalArgumentException(
@@ -102,13 +125,13 @@ public class AstaService {
 		}
 	}
 
-	////28/12/2024 Simone SERVICE UTILIZZATO PER POTER FARE UN OFFERTA 3)
+	//// 28/12/2024 Simone SERVICE UTILIZZATO PER POTER FARE UN OFFERTA 3)
 	@Transactional
-	public void faiOfferta(Long astaId, Long userId, BigDecimal offerta) {
+	public void faiOfferta(Long astaId, Long userId, BigDecimal importoOfferta) {
 		Asta asta = astaMapper.findById(astaId);
 
 		if (asta == null || !asta.getIsAttiva()) {
-			throw new RuntimeException("Asta non trovato o non attiva");
+			throw new RuntimeException("Asta non trovata o non attiva");
 		}
 
 		if (asta.getDataFine().isBefore(now)) {
@@ -117,23 +140,42 @@ public class AstaService {
 
 		Item item = itemMapper.findById(asta.getItemId());
 		if (asta.getOffertaCorrente() == null) {
-			if (offerta.compareTo(item.getPrezzoBase()) < 0) {
+			if (importoOfferta.compareTo(item.getPrezzoBase()) < 0) {
 				throw new RuntimeException("L'offerta deve essere maggiore o uguale al prezzo base");
 			}
 		} else {
 
 			BigDecimal offertaMinima = asta.getOffertaCorrente().add(item.getRilancioMinimo());
-			if (offerta.compareTo(offertaMinima) < 0) {
+			if (importoOfferta.compareTo(offertaMinima) < 0) {
 				throw new RuntimeException("L'offerta deve superare l'offerta corrente di almeno il rilancio minimo");
 			}
+
 		}
 
-		asta.setOffertaCorrente(offerta);
+		Offerta offerta = new Offerta();
+		offerta.setAstaId(astaId);
+		offerta.setItemId(asta.getItemId());
+		offerta.setUtenteId(userId);
+		offerta.setImporto(importoOfferta);
+		offerta.setDataOfferta(LocalDateTime.now());
+
+		offertaMapper.insert(offerta);
+
+		asta.setOffertaCorrente(importoOfferta);
 		asta.setOffertaCorrenteId(userId);
 		astaMapper.updateOfferta(asta);
 	}
 
-	//28/12/2024 Simone SERVICE PER POTER TERMINARE UN'ASTA 4)
+	public List<OffertaDTO> getStoricoOfferte(Long astaId, Long userId) {
+		Utente utente = utenteMapper.findById(userId);
+		boolean isGestore = "GESTORE".equals(utente.getRuolo());
+
+		List<Offerta> offerte = offertaMapper.findByAstaId(astaId);
+
+		return offerte.stream().map(offerta -> OffertaDTO.fromOfferta(offerta, isGestore)).collect(Collectors.toList());
+	}
+
+	// 28/12/2024 Simone SERVICE PER POTER TERMINARE UN'ASTA 4)
 	@Transactional
 	public void terminaAsta(Long astaId, Long gestoreId) {
 		Asta asta = astaMapper.findById(astaId);
@@ -159,23 +201,23 @@ public class AstaService {
 		itemMapper.update(item);
 	}
 
-	//28/12/2024 Simone SERVICE PER IL CONTROLLO DELLE ASTE SCADUTE 5)
+	// 28/12/2024 Simone SERVICE PER IL CONTROLLO DELLE ASTE SCADUTE 5)
 	@Transactional
 	public void checkAsteScadute() {
-	    // Aggiungiamo log per debug
-	    LocalDateTime now = LocalDateTime.now();
-	    System.out.println("Checking aste scadute at: " + now);
-	    
-	    List<Asta> asteScadute = astaMapper.findAsteScadute();
-	    System.out.println("Trovate " + asteScadute.size() + " aste scadute");
-	    
-	    for (Asta asta : asteScadute) {
-	        System.out.println("Terminando asta: " + asta.getId() + " con data fine: " + asta.getDataFine());
-	        terminaAsta(asta.getId(), null);
-	    }
+		// Aggiungiamo log per debug
+		LocalDateTime now = LocalDateTime.now();
+		System.out.println("Checking aste scadute at: " + now);
+
+		List<Asta> asteScadute = astaMapper.findAsteScadute();
+		System.out.println("Trovate " + asteScadute.size() + " aste scadute");
+
+		for (Asta asta : asteScadute) {
+			System.out.println("Terminando asta: " + asta.getId() + " con data fine: " + asta.getDataFine());
+			terminaAsta(asta.getId(), null);
+		}
 	}
 
-	//28/12/2024 Simone SERVICE PER RITROVARE LE ASTE CHE SONO STATE VINTE 6)
+	// 28/12/2024 Simone SERVICE PER RITROVARE LE ASTE CHE SONO STATE VINTE 6)
 	public List<Asta> getAsteVinte(Long userId) {
 		return astaMapper.findAsteVinte(userId);
 	}

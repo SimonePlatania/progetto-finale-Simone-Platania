@@ -44,11 +44,11 @@ public interface AstaMapper {
 	
 
 	@ResultMap("astaResultMap")
-	@Select("SELECT a.*, i.nome as nome_item, u.username as username_offerente " 
-			+ "FROM aste a "
-			+ "INNER JOIN items i ON a.item_id = i.id " 
-			+ "LEFT JOIN users u ON a.offerta_corrente_id = u.id "
-			+ "WHERE a.is_attiva = true AND a.data_fine > NOW()")
+	@Select("SELECT a.*, i.nome as nome_item, u.username as username_offerente " + 
+	        "FROM aste a " +
+	        "LEFT JOIN items i ON a.item_id = i.id " + 
+	        "LEFT JOIN users u ON a.offerta_corrente_id = u.id " +
+	        "WHERE a.is_attiva = true AND a.data_fine > NOW()")
 	List<Asta> findAsteAttive();
 	
 

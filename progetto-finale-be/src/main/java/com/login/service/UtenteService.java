@@ -179,7 +179,6 @@ public class UtenteService {
             throw new RuntimeException("Sessione non valida o scaduta");
         }
         
-        // Aggiorna il timestamp dell'ultima attività
         sessioneMapper.updateLastAccessTime(sessionId);
         
         return utente;
