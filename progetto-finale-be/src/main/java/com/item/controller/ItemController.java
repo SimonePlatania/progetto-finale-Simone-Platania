@@ -1,5 +1,7 @@
 package com.item.controller;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +52,18 @@ public class ItemController {
    @GetMapping("/gestore/{gestoreId}")
    public ResponseEntity<?> getItemsByGestore(@PathVariable Long gestoreId) {
        return ResponseEntity.ok(itemService.findByGestoreId(gestoreId));
+   }
+   
+   @GetMapping
+   public ResponseEntity<List<Item>> getAllItems() {
+       try {
+           logger.info("Ricevuta richiesta per tutti gli items");
+           List<Item> items = itemService.findAll();
+           return ResponseEntity.ok(items);
+       } catch (Exception e) {
+           logger.error("Errore durante il recupero degli items", e);
+           return ResponseEntity.badRequest().build();
+       }
    }
    
 }

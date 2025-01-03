@@ -104,4 +104,8 @@ public class ItemService {
 	public List<Item> findByGestoreId(Long gestoreId) {
 		return itemMapper.findByGestoreId(gestoreId);
 	}
+	
+	public List<Item> findAll() {
+	    return itemMapper.findAll();
+	}
 }

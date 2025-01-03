@@ -109,24 +109,25 @@ import { useNavigate } from 'react-router-dom';
                     <div className="mt-6 text-center">
             <p><br/>
                 Non hai un account?
-                <p className="mb-3">
+                </p>
+                <div className="mb-3">
                     <button 
                         type="button"
                         onClick={vaiAllaRegistrazione}
                         className="btn reset">
                         Registrati come partecipante
                     </button>
-                    </p>
-                </p><br/>
+                    </div>
+                <br/>
                 <p>
                     Vuoi creare aste?
+                    </p>
                     <button 
                         type="button"
                         onClick={vaiAlGestore}
                         className="btn reset ml-2">
                         Registrati come gestore
                     </button>
-                </p>
                     </div>
                 </form>
             </div>
