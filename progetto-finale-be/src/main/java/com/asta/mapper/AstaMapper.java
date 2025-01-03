@@ -37,8 +37,8 @@ public interface AstaMapper {
 	List<Asta> findAll();
 
 	
-	@Insert("INSERT INTO aste (item_id, data_inizio, data_fine, stato, is_attiva, is_start_now) "
-			+ "VALUES (#{itemId}, #{dataInizio}, #{dataFine}, #{stato}, #{isAttiva}, #{isStartNow})")
+	@Insert("INSERT INTO aste (item_id, data_inizio, data_fine, stato, is_attiva, is_start_now, nome_item) "
+			+ "VALUES (#{itemId}, #{dataInizio}, #{dataFine}, #{stato}, #{isAttiva}, #{isStartNow}, #{nomeItem})")
 	@Options(useGeneratedKeys = true, keyProperty = "id")
 	void insert(Asta asta);
 	

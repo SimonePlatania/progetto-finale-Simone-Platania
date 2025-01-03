@@ -1,0 +1,95 @@
+/* AstaCard.css */
+.asta-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 10px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.asta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.asta-titolo h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.asta-id {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 5px 0;
+}
+
+.asta-tempo {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.asta-info {
+    margin: 15px 0;
+}
+
+.asta-bidder {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.asta-form {
+    margin-top: 15px;
+}
+
+.form-group {
+    display: flex;
+    gap: 10px;
+}
+
+.offerta-input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.bottone-offerta {
+    padding: 8px 15px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.bottone-offerta:hover {
+    background-color: #1565c0;
+}
+
+.error-message {
+    color: #d32f2f;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.termina-asta {
+    width: 100%;
+    padding: 10px;
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.termina-asta:hover {
+    background-color: #c62828;
+}
