@@ -32,7 +32,6 @@ public class AstaService {
 	    List<Asta> asteAttive = astaMapper.findAsteAttive();
 
 	    for (Asta asta : asteAttive) {
-	        // Se esiste un'asta con un'offerta corrente, recupera l'username dell'utente
 	        if (asta.getOffertaCorrenteId() != null) {
 	            Utente offerente = utenteMapper.findById(asta.getOffertaCorrenteId());
 	            if (offerente != null) {

@@ -93,7 +93,7 @@ public class UtenteController {
             @RequestHeader("Authorization") String sessionId) {
         logger.info("Ricevuta richiesta di aggiornamento per utente ID: " + id);
         try {
-            // Prima verifica che l'utente sia autorizzato
+            // 02/01/2025 Simone VEDERE SE UN UTENTE è autorizzato!
             Utente utenteCorrente = utenteService.getCurrentUser(sessionId);
             if (!utenteCorrente.getId().equals(id)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Non autorizzato");

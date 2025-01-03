@@ -29,13 +29,13 @@ public interface OffertaMapper {
 	
 	@Select("SELECT o.*, u.username as username_offerente " +
 	        "FROM offerte o " +
-	        "JOIN users u ON o.utente_id = u.id " +  // Mancava uno spazio dopo id
-	        "WHERE o.asta_id = #{astaId} " +         // Mancava uno spazio dopo astaId
+	        "JOIN users u ON o.utente_id = u.id " + 
+	        "WHERE o.asta_id = #{astaId} " +       
 	        "ORDER BY o.data_offerta DESC")
 	List<Offerta> findByAstaId(@Param("astaId") Long astaId);
 
-	@Insert("INSERT INTO offerte (item_id, asta_id, utente_id, importo, data_offerta) " + // Mancava una parentesi
-	        "VALUES (#{itemId}, #{astaId}, #{utenteId}, #{importo}, #{dataOfferta})")    // Mancava una parentesi
+	@Insert("INSERT INTO offerte (item_id, asta_id, utente_id, importo, data_offerta) " + 
+	        "VALUES (#{itemId}, #{astaId}, #{utenteId}, #{importo}, #{dataOfferta})") 
 	@Options(useGeneratedKeys = true, keyProperty = "id")
 	void insert(Offerta offerta);
 	

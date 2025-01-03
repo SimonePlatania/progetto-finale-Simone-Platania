@@ -88,21 +88,21 @@ public class UtenteService {
 	public LoginResponse login(LoginRequest request) {
 	    logger.info("Tentativo di login per username: {}", request.getUsername());
 	    
-	    // Verifica utente
+	    // VERIFICA UTENTE
 	    Utente utente = utenteMapper.findByUsername(request.getUsername());
 	    if (utente == null) {
 	        throw new RuntimeException("Username non trovato");
 	    }
 
-	    // Verifica password
+	    // VERIFICA PASSWORD
 	    if (!passwordEncoder.matches(request.getPassword(), utente.getPassword())) {
 	        throw new RuntimeException("Password non valida");
 	    }
 
-	    // Genera un sessionId unico
+	    // MI SERVE LA CREAZIONE DI UN SESSION ID UNICO AD OGNI LOGIN
 	    String sessionId = UUID.randomUUID().toString();
 	    
-	    // Salva la sessione nel database
+	    // UTILE PER SALVARE LA SESSIONE NEL DB
 	    try {
 	        utenteMapper.insertSessione(sessionId, utente.getId(), LocalDateTime.now(), LocalDateTime.now());
 	        logger.info("Sessione creata con successo per l'utente: {}", utente.getUsername());
