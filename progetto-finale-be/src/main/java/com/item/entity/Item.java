@@ -13,6 +13,9 @@ public class Item {
     private Boolean inAsta;
     private Long gestoreId;
     private String gestoreUsername;
+    private Boolean deleted = false;
+    
+    
     
     public Item() {}
     
@@ -27,7 +30,17 @@ public class Item {
     this.nome = nome; 
     }
     
-    public String getDescrizione() {
+    
+    
+    public Boolean getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Boolean deleted) {
+		this.deleted = deleted;
+	}
+
+	public String getDescrizione() {
     return descrizione;
     }
     

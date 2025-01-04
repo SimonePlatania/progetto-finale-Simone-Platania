@@ -1,6 +1,7 @@
 import { useState } from "react";
 import '../css/AstaCard.css';
 import axios from "axios";
+import AstaCountdown from "./AstaCountdown";
 
 function AstaCard({user, asta, onTermina, onOfferta}) {
     console.log("Dati asta ricevuti in AstaCard:", asta); //Non vedo il nome dell'oggetto
@@ -60,16 +61,6 @@ function AstaCard({user, asta, onTermina, onOfferta}) {
         }
     };
 
-    const formatDataFine = (data) => {
-        return new Date(data).toLocaleDateString('it-IT', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
-
     const formatDataOfferta = (data) => {
         return new Date(data).toLocaleString('it-IT', {
             day: '2-digit',
@@ -89,7 +80,7 @@ function AstaCard({user, asta, onTermina, onOfferta}) {
                     <p className="asta-id">ID Asta: {asta.id}</p>
                     <p className="asta-item-id">ID Item: {asta.itemId}</p>
                 </div>
-                <span className="asta-tempo">Termina: {formatDataFine(asta.dataFine)}</span>
+                <AstaCountdown dataFine={asta.dataFine}/>
             </div>
 
             <div className="asta-info">

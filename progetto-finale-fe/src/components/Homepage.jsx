@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import AstaCard from './AstaCard';
 import TabNavigation from './TabNavigation';
+import CreateItem from "./CreateItem";
+import ItemCard from "./ItemCard";
 
 function Homepage() {
-    // Gestione dello stato dell'applicazione
     const [asteAttive, setAsteAttive] = useState([]);
     const [items, setItems] = useState([]);
     const [error, setError] = useState('');
@@ -14,7 +15,6 @@ function Homepage() {
     const [tabAttiva, setTabAttive] = useState("aste");
     const navigate = useNavigate();
 
-    // Verifica della sessione utente all'avvio
     useEffect(() => {
         const sessionId = localStorage.getItem('sessionId');
         if (sessionId) {
@@ -40,7 +40,6 @@ function Homepage() {
         checkSession();
     }, [navigate]);
 
-    // Caricamento dati (aste e items) in base al ruolo utente
     useEffect(() => {
         const fetchData = async () => {
             if (!user) return;
@@ -98,12 +97,24 @@ function Homepage() {
 
     const handleTerminaAsta = async (astaId) => {
         try {
-            await axios.post(`http://localhost:8080/api/aste/${astaId}/termina`);
+            await axios.post(
+                `http://localhost:8080/api/aste/${astaId}/termina`,
+                null, 
+                {
+                    params: {
+                        gestoreId: user.id 
+                    },
+                    headers: {
+                        'Authorization': localStorage.getItem('sessionId')
+                    }
+                }
+            );
+            
             const response = await axios.get('http://localhost:8080/api/aste/attive');
             setAsteAttive(response.data);
         } catch (err) {
             setError("Errore durante la terminazione dell'asta");
-            console.error("Errore durante la terminazione", err);
+            console.error("Errore durante la terminazione:", err.response?.data);
         }
     };
 
@@ -130,61 +141,86 @@ function Homepage() {
                         )}
                     </div>
                 );
-            case "items":
-                if (user?.ruolo !== "GESTORE") return null;
-                return (
-                    <div className="items-grid">
-                        {items.length === 0 ? (
-                            <p>Nessun item disponibile</p>
-                        ) : (
-                            items.map(item => (
-                                <div key={item.id} className="item-card">
-                                    <h3>{item.nome}</h3>
-                                    <p>{item.descrizione}</p>
-                                    <p>Prezzo Base: €{item.prezzoBase}</p>
-                                    <p>Rilancio Minimo: €{item.rilancioMinimo}</p>
-                                    {!item.inAsta && (
-                                        <button onClick={() => handleCreaAsta(item.id)}>
-                                            Crea Asta
-                                        </button>
-                                    )}
-                                </div>
-                            ))
-                        )}
-                    </div>
-                );
-            default:
-                return null;
-        }
-    };
-
-    const handleCreaAsta = async (itemId) => {
-        try {
-            const dataFine = new Date();
-            dataFine.setDate(dataFine.getDate());
+                case "items":
+                    if (user?.ruolo !== "GESTORE") return null;
+                    return (
+                        <div className="items-section">
+                            <CreateItem 
+                                user={user}
+                                onItemCreated={(newItem) => {
+                                    setItems(prev => [...prev, newItem]);
+                                }}
+                            />
+                            <div className="items-list">
+                                {items.length === 0 ? (
+                                    <p>Nessun oggetto disponibile</p>
+                                ) : (
+                                    items.map(item => (
+                                        <ItemCard
+                                            key={item.id}
+                                            item={item}
+                                            user={user}
+                                            onDelete={(itemId) => {
+                                                setItems(prev => prev.filter(i => i.id !== itemId));
+                                            }}
+                                            onUpdate={(updatedItem) => {
+                                                setItems(prev => prev.map(i => 
+                                                    i.id === updatedItem.id ? updatedItem : i
+                                                ));
+                                            }}
+                                            onCreaAsta={handleCreaAsta}
+                                        />
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    );
             
-            await axios.post(`http://localhost:8080/api/aste`, {
+        default:
+            return null;
+    }
+};
+
+const handleCreaAsta = async (itemId) => {
+    try {
+        const dataFine = new Date();
+        dataFine.setHours(dataFine.getHours() + 24);
+
+        const response = await axios.post(
+            'http://localhost:8080/api/aste',
+            {
                 itemId: itemId,
-                dataFine: dataFine.toISOString(), 
+                dataFine: dataFine.toISOString(),
                 startNow: true
-            }, {
-                params: {
-                    gestoreId: user.id  
+            },
+            {
+                params: { gestoreId: user.id },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': localStorage.getItem('sessionId')
                 }
-            });
-    
+            }
+        );
+
+        if (response.status === 200) {
             const [asteResponse, itemsResponse] = await Promise.all([
-                axios.get('http://localhost:8080/api/aste/attive'),
-                axios.get(`http://localhost:8080/api/items/gestore/${user.id}`)
+                axios.get('http://localhost:8080/api/aste/attive', {
+                    headers: { 'Authorization': localStorage.getItem('sessionId') }
+                }),
+                axios.get(`http://localhost:8080/api/items/gestore/${user.id}`, {
+                    headers: { 'Authorization': localStorage.getItem('sessionId') }
+                })
             ]);
-    
+
             setAsteAttive(asteResponse.data);
             setItems(itemsResponse.data);
-        } catch (err) {
-            console.error('Errore dettagliato:', err.response?.data);  
-            setError('Errore durante la creazione dell\'asta');
+            setError('');
         }
-    };
+    } catch (err) {
+        console.error('Errore durante la creazione dell\'asta:', err);
+        setError(err.response?.data || 'Errore durante la creazione dell\'asta');
+    }
+};
 
     return (
         <div className="homepage">

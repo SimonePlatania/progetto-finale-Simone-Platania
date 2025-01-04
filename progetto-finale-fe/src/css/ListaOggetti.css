@@ -1,0 +1,138 @@
+/* ListaOggetti.css */
+
+.lista-oggetti-container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.sezione-creazione {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.griglia-oggetti {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.card-oggetto {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.card-oggetto:hover {
+    transform: translateY(-2px);
+}
+
+.titolo-oggetto {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 1.2rem;
+}
+
+.descrizione-oggetto {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.dettagli-economici {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+.bottone-crea-asta {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.bottone-crea-asta:hover {
+    background-color: #45a049;
+}
+
+.badge-in-asta {
+    text-align: center;
+    margin-top: 15px;
+    padding: 8px;
+    background-color: #ff9800;
+    color: white;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.no-items {
+    text-align: center;
+    color: #666;
+    grid-column: 1 / -1;
+    padding: 20px;
+}
+
+
+.error-message {
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-error {
+    background: none;
+    border: none;
+    color: #c62828;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.success-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4caf50;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 4px;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.section-title {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.5rem;
+}
