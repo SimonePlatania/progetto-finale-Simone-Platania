@@ -220,5 +220,9 @@ public class AstaService {
 	public List<Asta> getAsteVinte(Long userId) {
 		return astaMapper.findAsteVinte(userId);
 	}
+	
+	public List<Asta> getAstePartecipate(Long userId) {
+		return astaMapper.findAstePartecipate(userId);
+	}
 
 }

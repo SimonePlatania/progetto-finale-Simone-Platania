@@ -97,6 +97,12 @@ public class AstaController {
 		return ResponseEntity.ok(astaService.getAsteVinte(userId));
 	}
 
+	
+	@GetMapping("/partecipate/{userId}")
+	public ResponseEntity<List<Asta>> getAstePartecipate(@PathVariable Long userId) {
+		return ResponseEntity.ok(astaService.getAstePartecipate(userId));
+	}
+
 	// 29/12/2024 Simone
 	// http://localhost:8080/webjars/swagger-ui/index.html#/asta-controller/{astaId}/termina
 	// 5)

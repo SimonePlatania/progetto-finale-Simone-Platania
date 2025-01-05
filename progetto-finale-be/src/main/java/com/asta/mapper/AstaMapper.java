@@ -87,4 +87,13 @@ public interface AstaMapper {
 			+ "WHERE a.offerta_corrente_id = #{userId} " 
 			+ "AND a.is_attiva = false " + "AND a.stato = 'TERMINATA'")
 	List<Asta> findAsteVinte(@Param("userId") Long userId);
+	
+	@ResultMap("astaResultMap")
+	@Select("SELECT DISTINCT a.*, i.nome AS nome_item, u.username AS username_offerente " +
+	        "FROM aste a " +
+	        "LEFT JOIN items i ON a.item_id = i.id " +
+	        "LEFT JOIN users u ON a.offerta_corrente_id = u.id " +
+	        "JOIN offerte o ON o.asta_id = a.id " +
+	        "WHERE o.utente_id = #{userId}")  // Cambiato da user_id a utente_id
+	List<Asta> findAstePartecipate(@Param("userId") Long userId);
 }
