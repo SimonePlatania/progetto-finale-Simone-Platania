@@ -15,8 +15,6 @@ public class Item {
     private String gestoreUsername;
     private Boolean deleted = false;
     
-    
-    
     public Item() {}
     
     public Long getId() { return id; }

@@ -1,0 +1,205 @@
+# Documentazione Sistema Items Spring Boot
+
+## Indice
+1. [Struttura del Progetto](#1-struttura-del-progetto)
+2. [Componenti Chiave](#2-componenti-chiave)
+3. [Database](#3-database)
+4. [API REST](#4-api-rest)
+5. [Integrazione con Sistema Login](#5-integrazione-con-sistema-login)
+
+## 1. Struttura del Progetto
+
+```
+com.item
+├── controller
+├── entity
+├── service
+├── mapper
+└── exception
+```
+
+## 2. Componenti Chiave
+
+### 2.1 Entity (Item.java)
+```java
+public class Item {
+    private Long id;
+    private String nome;
+    private String descrizione;
+    private BigDecimal prezzoBase;
+    private BigDecimal rilancioMinimo;
+    private LocalDateTime dataCreazione;
+    private Boolean inAsta;
+    private Long gestoreId;
+    private String gestoreUsername;
+    private Boolean deleted = false;
+
+}
+```
+
+AGGIUNT IL BOOEAN DELETED perché avevo un problema nel momento che terminavo un asta e cancellavo un oggetto che era stato in asta
+
+### 2.2 Mapper (ItemMapper.java)
+```java
+@Mapper
+public interface ItemMapper {
+    @Select("SELECT i.*, u.username as gestore_username FROM items i " + 
+            "LEFT JOIN users u ON i.gestore_id = u.id")
+    @Results({
+        @Result(property = "id", column = "id"),
+        @Result(property = "gestoreId", column = "gestore_id"),
+        @Result(property = "gestoreUsername", column = "gestore_username")
+    })
+    List<Item> findAll();
+
+    @Select("SELECT i.*, u.username as gestore_username FROM items i " +
+           "JOIN users u ON i.gestore_id = u.id WHERE i.gestore_id = #{gestoreId}")
+    @Results({
+        @Result(property = "id", column = "id"),
+        @Result(property = "nome", column = "nome"),
+        @Result(property = "descrizione", column = "descrizione"),
+        @Result(property = "prezzoBase", column = "prezzo_base"),
+        @Result(property = "rilancioMinimo", column = "rilancio_minimo"),
+        @Result(property = "dataCreazione", column = "data_creazione"),
+        @Result(property = "inAsta", column = "in_asta"),
+        @Result(property = "gestoreId", column = "gestore_id"),
+        @Result(property = "gestoreUsername", column = "gestore_username")
+    })
+    List<Item> findByGestoreId(@Param("gestoreId") Long gestoreId);
+
+    @Select("SELECT * FROM items WHERE id = #{id}")
+    @Results({
+        @Result(property = "id", column = "id"),
+        @Result(property = "nome", column = "nome"),
+        @Result(property = "descrizione", column = "descrizione"),
+        @Result(property = "prezzoBase", column = "prezzo_base"),
+        @Result(property = "rilancioMinimo", column = "rilancio_minimo"),
+        @Result(property = "dataCreazione", column = "data_creazione"),
+        @Result(property = "inAsta", column = "in_asta"),
+        @Result(property = "gestoreId", column = "gestore_id"),
+        @Result(property = "gestoreUsername", column = "gestore_username",
+            one = @One(select = "com.login.mapper.UtenteMapper.findUsernameById"))
+    })
+    Item findById(@Param("id") Long id);
+
+    // Altri metodi CRUD
+}
+```
+
+### 2.3 Service (ItemService.java)
+```java
+@Service
+public class ItemService {
+    private final ItemMapper itemMapper;
+    private final UtenteMapper utenteMapper;
+
+    @Transactional
+    public void createItem(Item item, Long gestoreId) {
+        if (!isGestore(gestoreId)) {
+            throw new RuntimeException("Accesso negato: ruolo gestore richiesto");
+        }
+        validateItem(item);
+        item.setDataCreazione(LocalDateTime.now());
+        item.setInAsta(false);
+        item.setGestoreId(gestoreId);
+        itemMapper.insert(item);
+    }
+}
+```
+
+## 3. Database
+
+### Schema SQL
+```sql
+CREATE TABLE items (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    descrizione TEXT,
+    prezzo_base DECIMAL(10,2) NOT NULL,
+    rilancio_minimo DECIMAL(10,2) NOT NULL,
+    data_creazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    in_asta BOOLEAN DEFAULT FALSE,
+    gestore_id BIGINT,
+    FOREIGN KEY (gestore_id) REFERENCES users(id)
+);
+```
+
+## 4. API REST
+
+### Endpoints
+
+#### 1. Creazione Item
+- **URL**: `POST /api/items?gestoreId={id}`
+- **Body**:
+```json
+{
+    "nome": "string",
+    "descrizione": "string",
+    "prezzoBase": number,
+    "rilancioMinimo": number
+}
+```
+- **Response**: 200 OK o 400 Bad Request
+- **Autorizzazione**: Richiede gestoreId valido con ruolo GESTORE
+
+#### 2. Ottenere Item Specifico
+- **URL**: `GET /api/items/{id}`
+- **Response**: 
+```json
+{
+    "id": number,
+    "nome": "string",
+    "descrizione": "string",
+    "prezzoBase": number,
+    "rilancioMinimo": number,
+    "dataCreazione": "timestamp",
+    "inAsta": boolean,
+    "gestoreId": number,
+    "gestoreUsername": "string"
+}
+```
+
+#### 3. Ottenere Items per Gestore
+- **URL**: `GET /api/items/gestore/{gestoreId}`
+- **Response**: Array di items con username del gestore
+```json
+[
+    {
+        "id": number,
+        "nome": "string",
+        "descrizione": "string",
+        "prezzoBase": number,
+        "rilancioMinimo": number,
+        "dataCreazione": "timestamp",
+        "inAsta": boolean,
+        "gestoreId": number,
+        "gestoreUsername": "string"
+    }
+]
+```
+
+### Codici di Errore
+- 400: Dati invalidi
+- 403: Accesso negato (ruolo non gestore)
+- 404: Item non trovato
+- 500: Errore interno server
+
+## 5. Integrazione con Sistema Login
+
+### Security Configuration
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> {
+                auth.requestMatchers("/api/login/**", "/api/items/**").permitAll();
+                auth.anyRequest().authenticated();
+            })
+            .build();
+    }
+}
+```

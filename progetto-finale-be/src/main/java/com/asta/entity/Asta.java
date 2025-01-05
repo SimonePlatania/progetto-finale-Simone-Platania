@@ -17,6 +17,7 @@ public class Asta {
 	private String usernameOfferente;
 	private Boolean isStartNow;
 	
+	
 	public Asta(Long id, Long itemId, LocalDateTime dataInizio, LocalDateTime dataFine, BigDecimal offertaCorrente,
 			Long offertaCorrenteId, Boolean isAttiva, String stato, String nomeItem, String usernameOfferente, Boolean isStartNow) {
 		super();
@@ -108,6 +109,17 @@ public class Asta {
 	public void setUsernameOfferente(String usernameOfferente) {
 		this.usernameOfferente = usernameOfferente;
 	}
+
+
+	public Boolean getIsStartNow() {
+		return isStartNow;
+	}
+
+
+	public void setIsStartNow(Boolean isStartNow) {
+		this.isStartNow = isStartNow;
+	}
+	
 	
 	
 

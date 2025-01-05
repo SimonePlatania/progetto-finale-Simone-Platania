@@ -1,0 +1,177 @@
+# Documentazione Sistema Aste Online
+
+## Indice
+1. [Architettura del Sistema](#1-architettura-del-sistema)
+2. [Componenti Principali](#2-componenti-principali)
+3. [Database](#3-database)
+4. [API Endpoints](#4-api-endpoints)
+5. [Scheduler](#5-scheduler)
+6. [Integrazioni](#6-integrazioni)
+
+## 1. Architettura del Sistema
+
+### Struttura dei Package
+```
+com.asta
+├── controller (AstaController.java)
+├── dto (CreaAstaRequest.java)
+├── entity (Asta.java)
+├── mapper (AstaMapper.java)
+├── service (AstaService.java)
+└── scheduler (AstaScheduler.java)
+```
+
+## 2. Componenti Principali
+
+### 2.1 Entity (Asta.java)
+```java
+public class Asta {
+    private Long id;
+    private Long itemId;
+    private LocalDateTime dataInizio;
+    private LocalDateTime dataFine;
+    private BigDecimal offertaCorrente;
+    private Long offertaCorrenteId;
+    private Boolean isAttiva;
+    private String stato;
+    private String nomeItem;
+    private String usernameOfferente;
+    private Boolean startNow;
+}
+```
+
+### 2.2 DTO Request
+```java
+public class CreaAstaRequest {
+    @NotNull(message = "ID dell'item è obbligatorio")
+    private Long itemId;
+    private LocalDateTime dataInizio;
+    @NotNull(message = "Data fine è obbligatoria")
+    private LocalDateTime dataFine;
+    private Boolean startNow;
+}
+```
+
+## 3. Database
+
+### Schema SQL
+```sql
+CREATE TABLE aste (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    item_id BIGINT NOT NULL,
+    data_inizio TIMESTAMP NOT NULL,
+    data_fine TIMESTAMP NOT NULL,
+    offerta_corrente DECIMAL(10,2),
+    offerta_corrente_id BIGINT,
+    is_attiva BOOLEAN DEFAULT true,
+    nome_item VARCHAR(255),
+    username_offerente VARCHAR(255),
+    is_start_now TINYINT(1) DEFAULT false,
+    FOREIGN KEY (item_id) REFERENCES items(id),
+    FOREIGN KEY (offerta_corrente_id) REFERENCES users(id)
+);
+```
+
+## 4. API Endpoints
+
+### 4.1 Creazione Asta
+```http
+POST /api/aste?gestoreId={id}
+Content-Type: application/json
+
+{
+    "itemId": number,
+    "dataFine": "yyyy-MM-ddTHH:mm:ss",
+    "startNow": boolean
+}
+```
+
+### 4.2 Lista Aste Attive
+```http
+GET /api/aste/attive
+```
+
+### 4.3 Fare un'Offerta
+```http
+POST /api/aste/{astaId}/offerte?userId={id}&importoOfferta={amount}
+```
+
+### 4.4 Dettaglio Asta
+```http
+GET /api/aste/{id}
+```
+
+### 4.5 Lista Aste Vinte
+```http
+GET /api/aste/vinte/{userId}
+```
+
+### 4.6 Terminare Asta
+```http
+POST /api/aste/{astaId}/termina?gestoreId={id}
+```
+
+## 5. Scheduler
+
+### 5.1 Configurazione
+```java
+@EnableScheduling
+public class ProgettoLoginApplication {
+    // ...
+}
+```
+
+### 5.2 Implementazione
+```java
+@Component
+public class AstaScheduler {
+    @Scheduled(fixedRate = 60000)
+    public void checkAsteScadute() {
+        // Controlla e termina le aste scadute ogni minuto
+    }
+}
+```
+
+## 6. Integrazioni
+
+### 6.1 Integrazione con Sistema Items
+- Verifica proprietà item prima della creazione asta
+- Aggiornamento stato item quando un'asta viene creata/terminata
+- Controllo autorizzazioni gestore
+
+### 6.2 Integrazione con Sistema Utenti
+- Verifica ruoli per creazione asta
+- Tracking offerte utenti
+- Gestione vincitori aste
+
+## Note Tecniche
+
+### Validazioni
+- Controllo date inizio/fine asta
+- Verifica importi offerte
+- Validazione autorizzazioni
+
+### Transazioni
+- Gestione atomica creazione asta e aggiornamento item
+- Gestione sicura delle offerte
+
+### Sicurezza
+- Verifica ruolo gestore per operazioni riservate
+- Protezione endpoints sensibili
+
+## Workflow Tipico
+
+1. **Creazione Asta**
+   - Verifica autorizzazioni gestore
+   - Validazione date
+   - Aggiornamento stato item
+
+2. **Gestione Offerte**
+   - Verifica asta attiva
+   - Validazione importo offerta
+   - Aggiornamento stato asta
+
+3. **Terminazione Asta**
+   - Automatica via scheduler
+   - Manuale da gestore autorizzato
+   - Aggiornamento stati correlati

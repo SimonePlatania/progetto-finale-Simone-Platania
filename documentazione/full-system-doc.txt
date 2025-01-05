@@ -1,0 +1,281 @@
+# Documentazione Sistema Aste Online
+
+## Indice
+1. [Architettura del Sistema](#1-architettura-del-sistema)
+2. [Sistema di Autenticazione](#2-sistema-di-autenticazione)
+3. [Gestione Items](#3-gestione-items)
+4. [Gestione Aste](#4-gestione-aste)
+5. [Gestione Offerte](#5-gestione-offerte)
+6. [Sicurezza e Autorizzazioni](#6-sicurezza-e-autorizzazioni)
+7. [API Endpoints](#7-api-endpoints)
+8. [Database](#8-database)
+
+## 1. Architettura del Sistema
+
+### Struttura Package
+```
+com.asta
+├── controller
+├── dto
+├── entity
+├── mapper
+├── service
+└── security
+```
+
+### Componenti Principali
+- Sistema di autenticazione basato su sessioni
+- Gestione di items da parte dei gestori
+- Gestione aste con offerte
+- Sistema di autorizzazioni basato su ruoli (GESTORE/PARTECIPANTE)
+
+## 2. Sistema di Autenticazione
+
+### Sessioni
+```java
+@Mapper
+public interface SessioneMapper {
+    @Insert("INSERT INTO sessioni (session_id, user_id, creation_time, last_access_time) " +
+            "VALUES (#{sessionId}, #{userId}, #{creationTime}, #{lastAccessTime})")
+    void insertSessione(@Param("sessionId") String sessionId, ...);
+
+    @Select("SELECT u.* FROM users u " +
+            "JOIN sessioni s ON u.id = s.user_id " +
+            "WHERE s.session_id = #{sessionId} " +
+            "AND s.last_access_time > DATE_SUB(NOW(), INTERVAL 30 MINUTE)")
+    Utente findUtenteByValidSessionId(String sessionId);
+}
+```
+
+### SecurityConfig
+```java
+@Configuration
+public class SecurityConfig {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        SessionAuthenticationFilter sessionFilter = new SessionAuthenticationFilter(utenteService);
+        
+        return http
+            .addFilterBefore(sessionFilter, UsernamePasswordAuthenticationFilter.class)
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .maximumSessions(1)
+                .expiredUrl("/api/utenti/login")
+            )
+            // ... altre configurazioni
+            .build();
+    }
+}
+```
+
+## 3. Gestione Items
+
+### ItemController
+```java
+@RestController
+@RequestMapping("/api/items")
+public class ItemController {
+    @PostMapping
+    public ResponseEntity<?> createItem(@RequestBody Item item, 
+                                      @RequestParam Long gestoreId) { ... }
+    
+    @GetMapping("/gestore/{gestoreId}")
+    public ResponseEntity<?> getItemsByGestore(@PathVariable Long gestoreId) { ... }
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getItem(@PathVariable Long id) { ... }
+}
+```
+
+## 4. Gestione Aste
+
+### AstaMapper
+```java
+@Mapper
+public interface AstaMapper {
+    @Select("SELECT a.*, i.nome as nome_item, u.username as username_offerente " + 
+            "FROM aste a " +
+            "LEFT JOIN items i ON a.item_id = i.id " + 
+            "LEFT JOIN users u ON a.offerta_corrente_id = u.id " +
+            "WHERE a.is_attiva = true AND a.data_fine > NOW()")
+    List<Asta> findAsteAttive();
+    
+    // ... altri metodi
+}
+```
+
+## 5. Gestione Offerte
+
+### OffertaMapper
+```java
+@Mapper
+public interface OffertaMapper {
+    @Select("SELECT o.*, u.username as username_offerente " +
+            "FROM offerte o " +
+            "JOIN users u ON o.utente_id = u.id " +
+            "WHERE o.asta_id = #{astaId} " +
+            "ORDER BY o.data_offerta DESC")
+    List<Offerta> findByAstaId(@Param("astaId") Long astaId);
+    
+    @Insert("INSERT INTO offerte (item_id, asta_id, utente_id, importo, data_offerta) " +
+            "VALUES (#{itemId}, #{astaId}, #{utenteId}, #{importo}, #{dataOfferta})")
+    void insert(Offerta offerta);
+}
+```
+
+### OffertaDTO
+```java
+public class OffertaDTO {
+    private Long id;
+    private BigDecimal importo;
+    private LocalDateTime dataOfferta;
+    private String usernameOfferente;  // visibile solo ai gestori
+    
+    public static OffertaDTO fromOfferta(Offerta offerta, boolean isGestore) {
+        OffertaDTO dto = new OffertaDTO();
+        // ... mapping base
+        if (isGestore) {
+            dto.setUsernameOfferente(offerta.getUsernameOfferente());
+        }
+        return dto;
+    }
+}
+```
+
+## 6. Sicurezza e Autorizzazioni
+
+### SessionAuthenticationFilter
+```java
+public class SessionAuthenticationFilter extends OncePerRequestFilter {
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, 
+                                  HttpServletResponse response, 
+                                  FilterChain filterChain) {
+        String sessionId = request.getHeader("Authorization");
+        if (sessionId != null) {
+            Utente utente = utenteService.getCurrentUser(sessionId);
+            if (utente != null) {
+                UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(utente, null, null);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
+        }
+        filterChain.doFilter(request, response);
+    }
+}
+```
+
+## 7. API Endpoints
+
+### Autenticazione
+```http
+POST /api/utenti/login
+Content-Type: application/json
+{
+    "username": "string",
+    "password": "string"
+}
+```
+
+### Items
+```http
+POST /api/items?gestoreId={id}
+GET /api/items/gestore/{gestoreId}
+GET /api/items/{id}
+```
+
+### Aste
+```http
+POST /api/aste?gestoreId={id}
+GET /api/aste/attive
+GET /api/aste/{id}
+```
+
+### Offerte
+```http
+POST /api/aste/{astaId}/offerte?userId={id}&importoOfferta={amount}
+GET /api/aste/{astaId}/offerte?userId={id}
+```
+
+## 8. Database
+
+### Schema Database
+```sql
+CREATE TABLE users (
+    id bigint NOT NULL AUTO_INCREMENT,
+    username varchar(50) NOT NULL UNIQUE,
+    email varchar(100) NOT NULL UNIQUE,
+    password varchar(100) NOT NULL,
+    role varchar(20) NOT NULL,
+    created_at timestamp DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE items (
+    id bigint NOT NULL AUTO_INCREMENT,
+    nome varchar(100) NOT NULL,
+    descrizione text,
+    prezzo_base decimal(10,2) NOT NULL,
+    rilancio_minimo decimal(10,2) NOT NULL,
+    data_creazione timestamp DEFAULT CURRENT_TIMESTAMP,
+    in_asta boolean DEFAULT false,
+    gestore_id bigint,
+    PRIMARY KEY (id),
+    FOREIGN KEY (gestore_id) REFERENCES users(id)
+);
+
+CREATE TABLE aste (
+    id bigint NOT NULL AUTO_INCREMENT,
+    item_id bigint NOT NULL,
+    data_inizio timestamp NOT NULL,
+    data_fine timestamp NOT NULL,
+    offerta_corrente decimal(10,2),
+    offerta_corrente_id bigint,
+    is_attiva boolean DEFAULT true,
+    stato varchar(50),
+    nome_item varchar(255),
+    username_offerente varchar(255),
+    is_start_now boolean DEFAULT false,
+    PRIMARY KEY (id),
+    FOREIGN KEY (item_id) REFERENCES items(id),
+    FOREIGN KEY (offerta_corrente_id) REFERENCES users(id)
+);
+
+CREATE TABLE offerte (
+    id bigint NOT NULL AUTO_INCREMENT,
+    item_id bigint NOT NULL,
+    asta_id bigint NOT NULL,
+    utente_id bigint NOT NULL,
+    importo decimal(10,2) NOT NULL,
+    data_offerta timestamp NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (item_id) REFERENCES items(id),
+    FOREIGN KEY (asta_id) REFERENCES aste(id),
+    FOREIGN KEY (utente_id) REFERENCES users(id)
+);
+
+CREATE TABLE sessioni (
+    session_id varchar(36) NOT NULL,
+    user_id bigint NOT NULL,
+    creation_time timestamp NOT NULL,
+    last_access_time timestamp NOT NULL,
+    PRIMARY KEY (session_id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+```
+
+## Note Implementative
+
+1. **Visibilità Offerte**
+   - Gli username degli offerenti sono visibili solo ai gestori
+   - I partecipanti vedono solo gli importi delle offerte
+
+2. **Sicurezza**
+   - Sessioni con scadenza automatica dopo 30 minuti
+   - Validazione ruoli per operazioni riservate
+   - Protezione contro accessi non autorizzati
+
+3. **Validazioni Business**
+   - Controllo importi minimi per le offerte
+   - Verifica stato aste e scadenze
+   - Validazione proprietà items per gestori

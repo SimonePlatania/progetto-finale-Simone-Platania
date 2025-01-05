@@ -4,9 +4,10 @@ import '../css/CreateAstaForm.css';
 
 function CreateAstaForm({ item, onSubmit, onCancel }) {
     const [astaData, setAstaData] = useState({
+        itemId: item.id,
         dataInizio: '',
         dataFine: '',
-        startNow: false,
+        startNow: true,
         prezzoIniziale: item.prezzoBase 
     });
 
@@ -15,6 +16,8 @@ function CreateAstaForm({ item, onSubmit, onCancel }) {
     const now = new Date();
     const minDate = new Date(now.getTime() + (15 * 60 * 1000)); 
     const maxDate = new Date(now.getTime() + (30 * 24 * 60 * 60 * 1000)); 
+
+    
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -30,7 +33,7 @@ function CreateAstaForm({ item, onSubmit, onCancel }) {
             return;
         }
 
-        const dataInizioDate = astaData.startNow ? new Date() : new Date(astaData.dataInizio);
+        const dataInizioDate = astaData.startNow ? now : new Date(astaData.dataInizio);
         const dataFineDate = new Date(astaData.dataFine);
 
         if (dataFineDate <= dataInizioDate) {
@@ -38,17 +41,27 @@ function CreateAstaForm({ item, onSubmit, onCancel }) {
             return;
         }
 
+           // Nuove validazioni
+    const minEndTime = new Date(dataInizioDate.getTime() + (15 * 60 * 1000));
+    if (dataFineDate < minEndTime) {
+        setError('L\'asta deve durare almeno 15 minuti');
+        return;
+    }
+
         onSubmit({
             ...astaData,
             itemId: item.id,
-            prezzoIniziale: item.prezzoBase
+            prezzoIniziale: item.prezzoBase,
+            dataInizio: astaData.startNow ? null : astaData.dataInizio
         });
     };
 
     return (
         <div className="create-asta-form">
             <h3>Crea nuova asta per: {item.nome}</h3>
-            <p className="item-price">Prezzo iniziale: €{item.prezzoBase.toFixed(2)}</p>
+            <p className="item-price">Prezzo iniziale: €{item.prezzoBase?.toFixed(2) || "0.00"}</p>
+            <br/>
+            <small>Questa sarà il prezzo iniziale dell'asta</small>
             
             <form onSubmit={handleSubmit}>
                 <div className="form-group">

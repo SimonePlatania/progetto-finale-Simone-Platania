@@ -11,8 +11,11 @@ function ListaOggetti({ items, user, onCreaAsta, onUpdateItems }) {
     const [selectedItem, setSelectedItem] = useState(null);
 
     const handleCreaAstaClick = (item) => {
+        if (window.confirm("Sei sicuro di voler creare un'asta per questo oggetto?")) {
         setSelectedItem(item);
         setShowAstaForm(true);
+
+        }
     };
 
     const handleItemCreated = (newItem) => {
@@ -48,6 +51,7 @@ function ListaOggetti({ items, user, onCreaAsta, onUpdateItems }) {
             if (response.status === 200) {
                 setShowAstaForm(false);
                 setSelectedItem(null);
+                alert("Asta creata con successo")
                 
                 if (onCreaAsta) {
                     onCreaAsta(selectedItem.id);
@@ -99,9 +103,12 @@ function ListaOggetti({ items, user, onCreaAsta, onUpdateItems }) {
 
             <div className="griglia-oggetti">
                 {items.length === 0 ? (
-                    <p className="no-items">Nessun oggetto disponibile</p>
+                    <p className="no-items">
+                        {user.ruolo === "GESTORE"
+                        ? "Non hai ancora creato nessun oggetto."
+                        : "Nessun oggetto disponibile al momento."}
+                        </p>
                 ) : (
-                    // Qui inizia la sezione che aveva problemi di sintassi
                     <>
                         {items.map(item => (
                             <div key={item.id} className="card-oggetto">

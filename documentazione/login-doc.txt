@@ -1,0 +1,289 @@
+# Documentazione Sistema Login Spring Boot
+
+## Indice
+1. [Struttura del Progetto](#1-struttura-del-progetto)
+2. [Funzionalità Implementate](#2-funzionalità-implementate)
+3. [Componenti Chiave](#3-componenti-chiave)
+4. [Sicurezza](#4-sicurezza)
+5. [Best Practices](#5-best-practices)
+6. [Database](#6-database)
+7. [Elementi Riutilizzabili](#7-elementi-riutilizzabili)
+8. [Punti di Estensione](#8-punti-di-estensione)
+
+## 1. Struttura del Progetto
+
+Il progetto segue una struttura modulare organizzata in package:
+
+```
+com.login
+├── controller (gestione delle richieste HTTP)
+├── entity (modelli dei dati)
+├── service (logica di business)
+├── mapper (interazione con database)
+└── dto (oggetti per il trasferimento dati)
+```
+
+## 2. Funzionalità Implementate
+
+### 2.1 Registrazione Utente
+
+#### Codice Controller
+```java
+@PostMapping("/registra")
+public ResponseEntity<?> registra(@RequestBody RegisterRequest request) {
+    logger.info("Ricevuta richiesta di registrazione per username: {}", request.getUsername());
+    try {
+        utenteService.registra(request);
+        return ResponseEntity.ok("Registrazione completata con successo");
+    } catch (Exception e) {
+        logger.error("Errore durante la registrazione", e);
+        return ResponseEntity.badRequest().body("Errore: " + e.getMessage());
+    }
+}
+```
+
+#### Validazioni DTO
+```java
+public class RegisterRequest {
+    @NotBlank(message = "Username non può essere vuoto")
+    @Size(min = 3, max = 30, message = "Username deve essere tra 3 e 30 caratteri")
+    private String username;
+    
+    @NotBlank(message = "Email non può essere vuota")
+    @Email(message = "Email non valida")
+    private String email;
+    
+    @NotBlank(message = "La password non può essere vuota")
+    @Size(min = 6, message = "La password deve contenere almeno 6 caratteri")
+    private String password;
+}
+```
+
+### 2.2 Login
+
+#### Codice Controller
+```java
+@PostMapping("/login")
+public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+    logger.info("Ricevuta richiesta di login per username: {}", request.getUsername());
+    try {
+        Utente utente = utenteService.login(request);
+        return ResponseEntity.ok(utente);
+    } catch (Exception e) {
+        logger.error("Errore durante il login", e);
+        return ResponseEntity.badRequest().body("Errore: " + e.getMessage());
+    }
+}
+```
+
+#### Service Implementation
+```java
+@Transactional
+public Utente login(LoginRequest request) {
+    Utente utente = utenteMapper.findByUsername(request.getUsername());
+    if (utente == null) {
+        throw new RuntimeException("Email non trovata");
+    }
+    
+    if (!passwordEncoder.matches(request.getPassword(), utente.getPassword())) {
+        throw new RuntimeException("Password non valida");
+    }
+    
+    return utente;
+}
+```
+
+### 2.3 Aggiornamento Profilo
+
+#### Codice Controller
+```java
+@PutMapping("/{id}")
+public ResponseEntity<?> aggiornaUtente(@PathVariable Long id, @RequestBody ProfiloUpdateRequest request) {
+    logger.info("Ricevuta richiesta di aggiornamento per utente ID: {}", id);
+    try {
+        Utente utenteAggiornato = utenteService.aggiornaUtente(id, request);
+        return ResponseEntity.ok(utenteAggiornato);
+    } catch (Exception e) {
+        logger.error("Errore durante l'aggiornamento dell'utente", e);
+        return ResponseEntity.badRequest().body("Errore: " + e.getMessage());
+    }
+}
+```
+
+#### Service Implementation
+```java
+@Transactional
+public Utente aggiornaUtente(Long id, ProfiloUpdateRequest request) {
+    Utente utente = utenteMapper.findById(id);
+    if (utente == null) {
+        throw new RuntimeException("Utente non trovato con ID: " + id);
+    }
+    
+    boolean modificheEffettuate = false;
+    
+    if (request.getUsername() != null && !request.getUsername().equals(utente.getUsername())) {
+        if (utenteMapper.existsByUsername(request.getUsername())) {
+            throw new RuntimeException("Username già in uso");
+        }
+        utente.setUsername(request.getUsername());
+        modificheEffettuate = true;
+    }
+    
+    if (request.getEmail() != null && !request.getEmail().equals(utente.getEmail())) {
+        if (utenteMapper.findByEmail(request.getEmail()) != null) {
+            throw new RuntimeException("Email già in uso");
+        }
+        utente.setEmail(request.getEmail());
+        modificheEffettuate = true;
+    }
+    
+    if (modificheEffettuate) {
+        utenteMapper.updateUtente(utente);
+        return utenteMapper.findById(id);
+    }
+    
+    return utente;
+}
+```
+
+## 3. Componenti Chiave
+
+### 3.1 Entity (Utente.java)
+```java
+public class Utente {
+    private Long id;
+    private String username;
+    private String email;
+    private String password;
+    private String ruolo;
+    private LocalDateTime dataCreazione;
+    
+    // Costruttori
+    public Utente() {}
+    
+    public Utente(String username, String email, String password, String ruolo) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.ruolo = ruolo;
+    }
+    
+    // Getter e Setter
+}
+```
+
+### 3.2 Mapper (UtenteMapper.java)
+```java
+@Mapper
+public interface UtenteMapper {
+    @Select("SELECT EXISTS(SELECT 1 FROM users WHERE username = #{username})")
+    boolean existsByUsername(String username);
+    
+    @Select("SELECT * FROM users WHERE username = #{username}")
+    Utente findByUsername(String username);
+    
+    @Select("SELECT * FROM users WHERE email = #{email}")
+    Utente findByEmail(String email);
+    
+    @Insert("INSERT INTO users (username, email, password, ruolo, data_creazione) " +
+            "VALUES (#{username}, #{email}, #{password}, #{ruolo}, #{dataCreazione})")
+    void insert(Utente utente);
+    
+    @Update("UPDATE users SET email = #{email}, username = #{username} WHERE id = #{id}")
+    void updateUtente(Utente utente);
+}
+```
+
+## 4. Sicurezza
+
+### SecurityConfig
+```java
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> {
+                auth.requestMatchers("/api/**").permitAll();
+                auth.anyRequest().authenticated();
+            })
+            .build();
+    }
+    
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+```
+
+## 5. Best Practices
+
+### 5.1 Gestione Transazioni
+```java
+@Transactional
+public void metodo() {
+    // logica transazionale
+}
+```
+
+### 5.2 Logging
+```java
+private static final Logger logger = LoggerFactory.getLogger(UtenteController.class);
+logger.info("Messaggio info");
+logger.error("Messaggio errore");
+```
+
+### 5.3 Null Checks
+```java
+if (request.getEmail() != null && !request.getEmail().equals(utente.getEmail()))
+```
+
+## 6. Database
+
+### Schema SQL
+```sql
+CREATE TABLE users (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(100) NOT NULL,
+    role VARCHAR(20) NOT NULL,
+    created_at DATETIME NOT NULL
+);
+```
+
+## 7. Elementi Riutilizzabili
+
+1. **SecurityConfig**: Configurazione base per Spring Security
+2. **DTO Pattern**: Validazione input con annotazioni
+3. **Sistema di Logging**: Logger configurato con SLF4J
+4. **Gestione Errori**: Try-catch con ResponseEntity
+5. **Mapper**: Query ottimizzate con MyBatis
+
+## 8. Punti di Estensione
+
+1. **Nuovi Ruoli**: Aggiungere enum per ruoli specifici
+2. **JWT**: Implementare autenticazione token-based
+3. **Recupero Password**: Aggiungere endpoint e logica
+4. **Verifica Email**: Sistema di verifica via email
+5. **Gestione Sessioni**: Supporto multi-sessione
+
+## Note Tecniche
+
+### Ottimizzazioni Query
+- Uso di `SELECT 1` per verifiche di esistenza
+- Update selettivo dei campi
+- Transazioni per operazioni multiple
+
+### Sicurezza
+- Password sempre criptate con BCrypt
+- Validazioni input sia lato DTO che business
+- CORS configurato per frontend
+
+### Gestione Errori
+- Logging strutturato
+- Response personalizzate
+- Rollback transazioni in caso di errore
