@@ -5,8 +5,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication(scanBasePackages = {"com.login", "com.item", "com.asta"})
-@MapperScan({"com.login.mapper", "com.item.mapper", "com.asta.mapper"})
+@SpringBootApplication(scanBasePackages = {"com.login", "com.item", "com.asta", "com.notifica"})
+@MapperScan({"com.login.mapper", "com.item.mapper", "com.asta.mapper", "com.notifica.mapper"})
 @EnableScheduling
 public class ProgettoLoginApplication {
 

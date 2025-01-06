@@ -1,7 +1,6 @@
 package com.login.config;
 
 import java.util.Arrays;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +13,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 import com.login.service.UtenteService;
 
 @Configuration
@@ -36,8 +34,10 @@ public class SecurityConfig {
             )
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .headers(headers -> headers
+                .frameOptions(frame -> frame.sameOrigin())
+            )
             .authorizeHttpRequests(auth -> {
-                // DOCUMENTI E SWAGGER
                 auth.requestMatchers(
                     "/api-docs",
                     "/api-docs/**",
@@ -46,47 +46,53 @@ public class SecurityConfig {
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/ws/**",
-                    "/webjars/**"
+                    "/ws",
+                    "/user/**",
+                    "/app/**",
+                    "/notifica/**",
+                    "/webjars/**",
+                    "/api/notifiche/**"
                 ).permitAll();
-
-                // AUTENTICAZIONE UTENTE
                 auth.requestMatchers(
                     "/api/utenti/registra",
                     "/api/utenti/registra/gestore",
                     "/api/utenti/login",
                     "/api/utenti/me"
                 ).permitAll();
-
-                // ASTE E OFFERTE (Tutti GET)
                 auth.requestMatchers(
                     "/api/aste/attive",
                     "/api/aste/{id}",
                     "/api/aste/{astaId}/offerte"
                 ).permitAll();
-
-                // ITEMS
                 auth.requestMatchers(
                     "/api/items/**"
                 ).authenticated();
-
                 auth.anyRequest().authenticated();
             })
             .build();
     }
     
-	    @Bean
-	    public CorsConfigurationSource corsConfigurationSource() {
-	        CorsConfiguration configuration = new CorsConfiguration();
-	        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
-	        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-	        configuration.setAllowedHeaders(Arrays.asList("*"));
-	        configuration.setAllowCredentials(true);
-	        configuration.setExposedHeaders(Arrays.asList("Authorization"));
-	        
-	        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	        source.registerCorsConfiguration("/**", configuration);
-	        return source;
-	    }
-	    
-
-	}
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList(
+            "*",
+            "Authorization",
+            "Content-Type",
+            "X-Requested-With",
+            "accept",
+            "Origin",
+            "Access-Control-Request-Method",
+            "Access-Control-Request-Headers"
+        ));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+}

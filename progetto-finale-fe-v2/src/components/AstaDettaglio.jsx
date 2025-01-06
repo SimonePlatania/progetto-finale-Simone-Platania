@@ -118,6 +118,7 @@ function AstaDettaglio() {
       setOfferte(offerteResponse.data);
       setImportoOfferta("");
       setError("");
+      
   
     } catch (err) {
       if (err.response?.status === 401) {

@@ -1,5 +1,5 @@
-// hooks/useNotifications.js
 import { useState, useEffect } from 'react';
+import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 
 export const useNotifications = (userId) => {
@@ -9,61 +9,88 @@ export const useNotifications = (userId) => {
     useEffect(() => {
         if (!userId) return;
 
-        console.log('Inizializzazione connessione WebSocket...');
-        
-        const client = new Client({
-            brokerURL: `ws://localhost:8080/ws`,
-            
-            connectionTimeout: 10000,
-            
-            reconnectDelay: 5000,
-            heartbeatIncoming: 4000,
-            heartbeatOutgoing: 4000,
-            
-            debug: function(str) {
+        // Funzione per caricare le notifiche iniziali
+        const fetchInitialNotifications = async () => {
+            try {
+                const response = await fetch(`http://localhost:8080/api/notifiche/utente/${userId}`, {
+                    credentials: 'include',
+                    headers: {
+                        'Authorization': localStorage.getItem('sessionId')
+                    }
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                setNotifications(data);
+            } catch (error) {
+                console.error('Errore caricamento notifiche:', error);
+            }
+        };
+
+        // Carica le notifiche all'avvio
+        fetchInitialNotifications();
+
+        // Configura WebSocket
+        const stompClient = new Client({
+            webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+            connectHeaders: {
+                'userId': userId.toString()
+            },
+            debug: (str) => {
                 console.log('STOMP Debug:', str);
             },
-            
-            onWebSocketError: (error) => {
-                console.error('Errore WebSocket:', error);
-                setIsConnected(false);
+            onConnect: () => {
+                console.log('Connected to WebSocket');
+                setIsConnected(true);
+
+                stompClient.subscribe(`/user/${userId}/notifica/utente`, (message) => {
+                    try {
+                        const notifica = JSON.parse(message.body);
+                        console.log('Nuova notifica ricevuta:', notifica);
+                        setNotifications(prev => [notifica, ...prev]);
+                    } catch (error) {
+                        console.error('Errore parsing notifica:', error);
+                    }
+                });
             },
-            
-            onStompError: (frame) => {
-                console.error('Errore STOMP:', frame);
+            onDisconnect: () => {
+                console.log('Disconnected from WebSocket');
                 setIsConnected(false);
             }
         });
 
-        client.onConnect = (frame) => {
-            console.log('Connessione WebSocket stabilita!');
-            setIsConnected(true);
+        stompClient.activate();
 
-            client.subscribe(`user/notifica/utente/${userId}`, (message) => {
-                try {
-                    const notifica = JSON.parse(message.body);
-                    console.log('Notifica ricevuta:', notifica);
-                    setNotifications(prev => [notifica, ...prev]);
-                } catch (error) {
-                    console.error('Errore parsing notifica:', error);
-                }
-            });
-        };
-
-        try {
-            console.log('Tentativo di connessione...');
-            client.activate();
-        } catch (error) {
-            console.error('Errore durante l\'attivazione:', error);
-        }
-
+        // Cleanup alla disconnessione
         return () => {
-            if (client.active) {
-                console.log('Chiusura connessione WebSocket...');
-                client.deactivate();
+            if (stompClient.active) {
+                stompClient.deactivate();
             }
         };
     }, [userId]);
 
-    return { notifications, isConnected };
+    // Funzione per marcare una notifica come letta
+    const markAsRead = async (notificationId) => {
+        try {
+            await fetch(`http://localhost:8080/api/notifiche/${notificationId}/read`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Authorization': localStorage.getItem('sessionId')
+                }
+            });
+            setNotifications(prev =>
+                prev.map(n => n.id === notificationId ? { ...n, letta: true } : n)
+            );
+        } catch (error) {
+            console.error('Errore nella marcatura come letta:', error);
+        }
+    };
+
+    return {
+        notifications,
+        isConnected,
+        markAsRead
+    };
 };

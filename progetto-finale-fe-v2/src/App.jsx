@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Navigate } from 'react-router-dom';
+import Layout from './components/Layout';
 import Homepage from './components/Homepage';
 import AstaDettaglio from './components/AstaDettaglio';
 import Login from './components/Login';
@@ -28,28 +29,33 @@ const router = createBrowserRouter([
     element: <RegistraGestore />
   },
   {
-    path: "/homepage",
-    element: <Homepage />
-  },
-  {
-    path: "/asta/:id",
-    element: <AstaDettaglio />
-  },
-  {
-    path: "/aste-vinte",
-    element: <AsteVinte/>
-  },
-  {
-    path: "/aste-partecipate",
-    element: <AstePartecipate/>
-  },
-  {
-    path: "/items",
-    element: <GestoreItems/>
-  },
-  {
-    path: "/modifica-profilo",
-    element: <ModificaProfilo/>
+    element: <Layout />,
+    children: [
+      {
+        path: "/homepage",
+        element: <Homepage />
+      },
+      {
+        path: "/asta/:id",
+        element: <AstaDettaglio />
+      },
+      {
+        path: "/aste-vinte",
+        element: <AsteVinte/>
+      },
+      {
+        path: "/aste-partecipate",
+        element: <AstePartecipate/>
+      },
+      {
+        path: "/items",
+        element: <GestoreItems/>
+      },
+      {
+        path: "/modifica-profilo",
+        element: <ModificaProfilo/>
+      }
+    ]
   }
 ]);
 

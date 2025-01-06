@@ -18,6 +18,7 @@ import com.item.entity.Item;
 import com.item.mapper.ItemMapper;
 import com.login.entity.Utente;
 import com.login.mapper.UtenteMapper;
+import com.notifica.service.NotificaService;
 
 @Service
 public class AstaService {
@@ -207,13 +208,17 @@ public class AstaService {
 		asta.setOffertaCorrenteId(userId);
 		astaMapper.updateOfferta(asta);
 		
-		List<Long> partecipanti = astaMapper.findPartecipantiByAstaId(astaId);
+		 	item = itemMapper.findById(asta.getItemId());
+		    String usernameOfferente = utenteMapper.findById(userId).getUsername();
+		    notificaService.inviaNotificaPartecipazione(astaId, userId, item.getGestoreId(), usernameOfferente);
+
 		
-		for (Long partecipanteId : partecipanti) {
-			if (!partecipanteId.equals(userId)) {
-				notificaService.inviaNotificaOfferta(astaId, userId, importoOfferta);
-			}
-		}
+		    List<Long> partecipanti = astaMapper.findPartecipantiByAstaId(astaId);
+		    for (Long partecipanteId : partecipanti) {
+		        if (!partecipanteId.equals(userId)) {
+		            notificaService.inviaNotificaOfferta(astaId, userId, importoOfferta);
+		        }
+		    }
 		
 		
 		if (asta.getDataFine().minusMinutes(5).isBefore(now)) {
