@@ -8,6 +8,7 @@ import RegistraGestore from './components/RegistraGestore';
 import AsteVinte from './components/AsteVinte';
 import AstePartecipate from './components/AstePartecipate';
 import GestoreItems from './components/GestoreItems';
+import ModificaProfilo from './components/ModificaProfilo';
 
 const router = createBrowserRouter([
   {
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
   {
     path: "/items",
     element: <GestoreItems/>
+  },
+  {
+    path: "/modifica-profilo",
+    element: <ModificaProfilo/>
   }
 ]);
 

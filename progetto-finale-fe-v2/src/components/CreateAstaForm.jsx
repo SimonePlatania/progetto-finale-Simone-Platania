@@ -48,7 +48,7 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
           {!formData.startNow && (
             <div>
               <label className="block mb-2">Data Inizio</label>
-              <input
+              <input 
                 type="datetime-local"
                 value={formData.dataInizio}
                 onChange={(e) => setFormData({
@@ -70,7 +70,7 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
                 ...formData,
                 dataFine: e.target.value
               })}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded-lg bg-gray-200"
               min={new Date().toISOString().slice(0, 16)}
               required
             />

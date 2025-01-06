@@ -32,6 +32,7 @@ public class AstaService {
 	    List<Asta> asteAttive = astaMapper.findAsteAttive();
 
 	    for (Asta asta : asteAttive) {
+	    	
 	        if (asta.getOffertaCorrenteId() != null) {
 	            Utente offerente = utenteMapper.findById(asta.getOffertaCorrenteId());
 	            if (offerente != null) {
@@ -136,6 +137,10 @@ public class AstaService {
 		if (asta.getDataFine().isBefore(now)) {
 			throw new RuntimeException("Asta terminata");
 		}
+		
+		if (userId.equals(asta.getOffertaCorrenteId())) {
+			throw new RuntimeException("Non puoi fare un'offerta se sei già l'ultimo offertente");
+		}
 
 		Item item = itemMapper.findById(asta.getItemId());
 		if (asta.getOffertaCorrente() == null) {
@@ -190,14 +195,27 @@ public class AstaService {
 				throw new RuntimeException("Non sei autorizzato a terminare questa asta");
 			}
 		}
+		
+		if (asta.getOffertaCorrenteId() != null) {
+			Item item = itemMapper.findById(asta.getItemId());
+			item.setInAsta(false);
+			item.setDeleted(true);
+			itemMapper.update(item);
+		} else {
+			
+			//06/01 Simone Aggiornato problema che mi evitava che un oggetto vinto venisse tolto dagli item
+			//Di un gestore
+			Item item = itemMapper.findById(asta.getItemId());
+			item.setInAsta(false);
+			//Non setto il deleted, perché non c'è un reale vincitore
+			itemMapper.update(item);
+			
+		}
 
 		asta.setIsAttiva(false);
 		asta.setStato("TERMINATA");
 		astaMapper.update(asta);
 
-		Item item = itemMapper.findById(asta.getItemId());
-		item.setInAsta(false);
-		itemMapper.update(item);
 	}
 
 	// 28/12/2024 Simone SERVICE PER IL CONTROLLO DELLE ASTE SCADUTE 5)

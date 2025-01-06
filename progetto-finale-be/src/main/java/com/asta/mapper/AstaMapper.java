@@ -27,7 +27,7 @@ public interface AstaMapper {
 			@Result(property = "stato", column = "stato"),
 			@Result(property = "nomeItem", column = "nome_item"),
 			@Result(property = "usernameOfferente", column = "username_offerente"),
-			@Result(property = "isStartNow", column = "is_start_now") 
+			@Result(property = "isStartNow", column = "is_start_now")
 	
 	})
 	@Select("SELECT a.*, i.nome as nome_item, u.username as username_offerente " 
@@ -44,7 +44,8 @@ public interface AstaMapper {
 	
 
 	@ResultMap("astaResultMap")
-	@Select("SELECT a.*, i.nome as nome_item, u.username as username_offerente " + 
+	@Select("SELECT a.*, i.nome as nome_item, i.prezzo_base, " +
+	        "u.username as username_offerente " +
 	        "FROM aste a " +
 	        "LEFT JOIN items i ON a.item_id = i.id " + 
 	        "LEFT JOIN users u ON a.offerta_corrente_id = u.id " +

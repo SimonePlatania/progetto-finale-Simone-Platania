@@ -51,6 +51,8 @@ public interface ItemMapper {
 	                one = @One(select = "com.login.mapper.UtenteMapper.findUsernameById"))
 	    })
 	    Item findById(@Param("id") Long id);
+	 
+	 
 	// 27/12/2024 Simone MAPPER INSERIMENTO OGGETTO NEL DATABASE 3)
 	 @Insert("INSERT INTO items (nome, descrizione, prezzo_base, rilancio_minimo, " +
 	            "data_creazione, in_asta, gestore_id, deleted) VALUES " +
@@ -63,7 +65,7 @@ public interface ItemMapper {
 	// 27/12/2024 Simone MAPPER AGGIORNAMENTO OGGETTO NEL DATABASE 4)
 	@Update("UPDATE items SET nome = #{nome}, descrizione = #{descrizione}, "
 			+ "prezzo_base = #{prezzoBase}, rilancio_minimo = #{rilancioMinimo}, "
-			+ "in_asta = #{inAsta} WHERE id = #{id}")
+			+ "in_asta = #{inAsta}, deleted = #{deleted} WHERE id = #{id}")
 	void update(Item item);
 
 	// 27/12/2024 Simone RIMOZIONE OGGETTO TRAMITE IL SUO ID 5)

@@ -149,14 +149,14 @@ function GestoreItems() {
               placeholder="Nome item"
               value={nuovoItem.nome}
               onChange={(e) => setNuovoItem({ ...nuovoItem, nome: e.target.value })}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded-lg bg-gray-200"
               required
             />
             <textarea
               placeholder="Descrizione"
               value={nuovoItem.descrizione}
               onChange={(e) => setNuovoItem({ ...nuovoItem, descrizione: e.target.value })}
-              className="w-full p-2 border rounded"
+              className="w-full p-2 border rounded-lg bg-gray-200"
             />
             <div className="grid grid-cols-2 gap-4">
               <input
@@ -165,7 +165,7 @@ function GestoreItems() {
                 placeholder="Prezzo base"
                 value={nuovoItem.prezzoBase}
                 onChange={(e) => setNuovoItem({ ...nuovoItem, prezzoBase: e.target.value })}
-                className="p-2 border rounded"
+                className="p-2 border rounded-lg bg-gray-200"
                 required
               />
               <input
@@ -174,7 +174,7 @@ function GestoreItems() {
                 placeholder="Rilancio minimo"
                 value={nuovoItem.rilancioMinimo}
                 onChange={(e) => setNuovoItem({ ...nuovoItem, rilancioMinimo: e.target.value })}
-                className="p-2 border rounded"
+                className="p-2 border rounded-lg bg-gray-200"
                 required
               />
             </div>

@@ -16,6 +16,7 @@ public class Asta {
 	private String nomeItem;
 	private String usernameOfferente;
 	private Boolean isStartNow;
+
 	
 	
 	public Asta(Long id, Long itemId, LocalDateTime dataInizio, LocalDateTime dataFine, BigDecimal offertaCorrente,
@@ -47,7 +48,7 @@ public class Asta {
 	public void setStartNow(Boolean isStartNow) {
 		this.isStartNow = isStartNow;
 	}
-
+	
 
 	public Long getId() {
 		return id;

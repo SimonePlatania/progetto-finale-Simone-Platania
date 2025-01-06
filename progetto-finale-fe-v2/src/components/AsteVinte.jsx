@@ -76,7 +76,8 @@ function AsteVinte() {
             {asteVinte.map((asta) => (
               <div
                 key={asta.id}
-                className="bg-white rounded-lg shadow-md p-6"
+                className="bg-white rounded-lg shadow-md p-6 flex flex-col min-h-[400px] 
+              transform transition-all duration-300 hover:scale-105"
               >
                 <h3 className="text-xl font-semibold mb-4">{asta.nomeItem}</h3>
                 <div className="space-y-2">

@@ -74,4 +74,30 @@ Aggiungere validazioni appropriate per le date
 Implementare un sistema di feedback per le operazioni riuscite/fallite
 Aggiungere animazioni per rendere l'interfaccia più fluida
 
-Queste modifiche costituiscono un importante passo avanti nella funzionalità e usabilità del sistema di gestione delle aste, fornendo una base solida per ulteriori miglioramenti. Copy
+Queste modifiche costituiscono un importante passo avanti nella funzionalità e usabilità del sistema di gestione delle aste, fornendo una base solida per ulteriori miglioramenti. 
+
+# Aggiornamenti Sistema Aste Online - 06/01/2025
+
+## 1. Visualizzazione Prezzo Base
+- Implementato il caricamento e la visualizzazione del prezzo base degli items nelle aste
+- Aggiunta gestione asincrona del caricamento dati
+- Migliorata la gestione degli errori durante il fetching dei dati
+
+## 2. Modifica Profilo Utente
+- Creato nuovo componente `ModificaProfilo.jsx`
+- Implementate validazioni per:
+  - Username (min 3 caratteri, max 30)
+  - Email (formato valido)
+- Stile coerente con il form di registrazione
+- Utilizzo del CSS esistente (Auth.css)
+- Gestione messaggi di successo e errore
+
+## 3. Miglioramenti UI/UX
+- Aggiunto feedback visivo per le azioni utente
+- Implementata navigazione fluida tra le pagine
+- Migliorata la gestione degli stati di loading
+
+## 4. Miglioramenti Tecnici
+- Ottimizzazione delle chiamate API
+- Gestione più robusta delle sessioni
+- Validazioni lato client migliorate
