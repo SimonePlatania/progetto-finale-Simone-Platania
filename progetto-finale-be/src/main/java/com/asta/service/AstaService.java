@@ -115,6 +115,11 @@ public class AstaService {
 		if (request.getDataFine() == null) {
 			throw new IllegalArgumentException("Data di fine deve essere specificata");
 		}
+		
+		if (request.getDataFine().isBefore(request.getDataInizio())) {
+			throw new IllegalArgumentException("La data di fine non può essere precedente a quella d'inizio");
+			
+		}
 
 		if (!request.isStartNow() && request.getDataInizio().isBefore(now)) {
 			throw new IllegalArgumentException("La data di inizio deve essere futura");
@@ -182,40 +187,32 @@ public class AstaService {
 	// 28/12/2024 Simone SERVICE PER POTER TERMINARE UN'ASTA 4)
 	@Transactional
 	public void terminaAsta(Long astaId, Long gestoreId) {
-		Asta asta = astaMapper.findById(astaId);
+	    Asta asta = astaMapper.findById(astaId);
 
-		if (asta == null) {
-			throw new RuntimeException("Asta non trovata");
-		}
+	    if (asta == null) {
+	        throw new RuntimeException("Asta non trovata");
+	    }
 
-		if (gestoreId != null) {
+	    if (gestoreId != null) {
+	        Item item = itemMapper.findById(asta.getItemId());
+	        if (!item.getGestoreId().equals(gestoreId)) {
+	            throw new RuntimeException("Non sei autorizzato a terminare questa asta");
+	        }
+	    }
 
-			Item item = itemMapper.findById(asta.getItemId());
-			if (!item.getGestoreId().equals(gestoreId)) {
-				throw new RuntimeException("Non sei autorizzato a terminare questa asta");
-			}
-		}
-		
-		if (asta.getOffertaCorrenteId() != null) {
-			Item item = itemMapper.findById(asta.getItemId());
-			item.setInAsta(false);
-			item.setDeleted(true);
-			itemMapper.update(item);
-		} else {
-			
-			//06/01 Simone Aggiornato problema che mi evitava che un oggetto vinto venisse tolto dagli item
-			//Di un gestore
-			Item item = itemMapper.findById(asta.getItemId());
-			item.setInAsta(false);
-			//Non setto il deleted, perché non c'è un reale vincitore
-			itemMapper.update(item);
-			
-		}
+	    asta.setIsAttiva(false);
+	    asta.setStato("TERMINATA");
+	    astaMapper.update(asta);
 
-		asta.setIsAttiva(false);
-		asta.setStato("TERMINATA");
-		astaMapper.update(asta);
-
+	    Item item = itemMapper.findById(asta.getItemId());
+	    item.setInAsta(false);
+	    
+	    // Se c'è stato un vincitore, marca l'item come deleted
+	    if (asta.getOffertaCorrenteId() != null) {
+	        item.setDeleted(true);
+	    }
+	    
+	    itemMapper.update(item);
 	}
 
 	// 28/12/2024 Simone SERVICE PER IL CONTROLLO DELLE ASTE SCADUTE 5)

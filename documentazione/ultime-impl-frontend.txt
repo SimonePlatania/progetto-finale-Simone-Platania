@@ -101,3 +101,66 @@ Queste modifiche costituiscono un importante passo avanti nella funzionalità e 
 - Ottimizzazione delle chiamate API
 - Gestione più robusta delle sessioni
 - Validazioni lato client migliorate
+
+# Aggiornamenti Sistema Aste - 07/01/2025
+
+## Validazioni Date Asta
+### Backend
+```java
+private void validateAstaRequest(CreaAstaRequest request) {
+   if (request.getDataFine().isBefore(request.getDataInizio())) {
+       throw new IllegalArgumentException("Data fine non può precedere data inizio");
+   }
+   // ... altre validazioni esistenti
+}
+Frontend (CreateAstaForm.jsx)
+
+Aggiunte validazioni:
+
+Data fine non precedente a data inizio
+Data inizio futura se !startNow
+Durata minima 5 minuti
+Date obbligatorie
+
+
+
+javascriptCopyconst handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    const now = new Date();
+    const start = formData.startNow ? now : new Date(formData.dataInizio);
+    const end = new Date(formData.dataFine);
+
+    if (!formData.startNow && !formData.dataInizio) {
+        setError("Data inizio obbligatoria se non si parte subito");
+        return;
+    }
+
+    if (!formData.dataFine) {
+        setError("Data fine obbligatoria");
+        return;
+    }
+
+    if (end < start) {
+        setError("Data fine non può precedere data inizio");
+        return;
+    }
+
+    if (!formData.startNow && start < now) {
+        setError("Data inizio deve essere futura");
+        return;
+    }
+
+    if ((end - start) < 300000) {
+        setError("Durata minima 5 minuti");
+        return;
+    }
+
+    // Submit if validation passes
+    await onSubmit(dataToSubmit);
+};
+Note Implementative
+
+Validazioni sincronizzate tra BE/FE
+Aggiunto feedback utente con messaggi errore
+Fix logica comparazione date

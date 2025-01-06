@@ -63,7 +63,7 @@ function AstePartecipate() {
           {astePartecipate.map((asta) => (
             <div
               key={asta.id}
-              className="bg-white rounded-lg shadow-md p-6 flex flex-col min-h-[400px] 
+              className="bg-white rounded-lg shadow-md p-6 flex flex-col min-h-[200px] 
               transform transition-all duration-300 hover:scale-105"
             >
               <h3 className="text-xl font-semibold mb-4">{asta.nomeItem}</h3>
@@ -78,12 +78,14 @@ function AstePartecipate() {
                   {asta.isAttiva ? 'In Corso' : 'Terminata'}
                 </p>
               </div>
-              <button
-                onClick={() => navigate(`/asta/${asta.id}`)}
-                className="mt-4 w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Visualizza Dettagli
-              </button>
+              {asta.isAttiva && (
+  <button
+    onClick={() => navigate(`/asta/${asta.id}`)}
+    className="mt-4 w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+  >
+    Visualizza Dettagli
+  </button>
+)}
             </div>
           ))}
         </div>

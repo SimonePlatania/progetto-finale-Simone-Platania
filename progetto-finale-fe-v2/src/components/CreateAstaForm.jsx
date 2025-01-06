@@ -9,17 +9,47 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
     dataFine: "",
     startNow: true
   });
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    const now = new Date();
+    const start = formData.startNow ? now : new Date(formData.dataInizio);
+    const end = new Date(formData.dataFine);
 
-  const dataToSubmit = {
-    ...formData,
-    dataInizio: formData.startNow ? null : formData.dataInizio,
+    if (!formData.startNow && !formData.dataInizio) {
+      setError("Data di inizio obbligatoria se l'asta non parte subito");
+      return;
+    }
+
+    if (!formData.dataFine) {
+      setError("Data di fine obbligatoria");
+      return;
+    }
+
+    if (end < start) {
+      setError("La data di fine non può essere precedente alla data di inizio");
+      return;
+    }
+
+    if (!formData.startNow && start < now) {
+      setError("La data di inizio deve essere futura");
+      return;
+    }
+
+    if ((end - start) < 300000) {
+      setError("L'asta deve durare almeno 5 minuti");
+      return;
+    }
+
+    const dataToSubmit = {
+      ...formData,
+      dataInizio: formData.startNow ? null : formData.dataInizio,
+    };
+
+    await onSubmit(dataToSubmit);
   };
-
-  await onSubmit(dataToSubmit);
-}
 
 
   return (
@@ -55,7 +85,7 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
                   ...formData,
                   dataInizio: e.target.value
                 })}
-                className="w-full p-2 border rounded"
+                className="w-full px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
                 min={new Date().toISOString().slice(0, 16)}
               />
             </div>
@@ -75,6 +105,12 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
               required
             />
           </div>
+
+          {error && (
+    <div className="text-red-500 text-sm mb-4">
+      {error}
+    </div>
+  )}
 
           <div className="flex justify-end gap-4 mt-6">
             <button

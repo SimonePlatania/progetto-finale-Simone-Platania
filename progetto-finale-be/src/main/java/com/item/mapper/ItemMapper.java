@@ -81,7 +81,15 @@ public interface ItemMapper {
     @Select("SELECT i.*, u.username as gestore_username " +
             "FROM items i " +
             "JOIN users u ON i.gestore_id = u.id " +
-            "WHERE i.gestore_id = #{gestoreId} AND i.deleted = false")
+            "WHERE i.gestore_id = #{gestoreId} " +
+            "AND i.deleted = false " +  
+            "AND i.in_asta = false " + 
+            "AND NOT EXISTS (" + 
+                "SELECT 1 FROM aste a " +
+                "WHERE a.item_id = i.id " +
+                "AND a.stato = 'TERMINATA' " +
+                "AND a.offerta_corrente_id IS NOT NULL" + 
+            ")")
     @ResultMap("itemResultMap")
     List<Item> findByGestoreId(@Param("gestoreId") Long gestoreId);
 	
