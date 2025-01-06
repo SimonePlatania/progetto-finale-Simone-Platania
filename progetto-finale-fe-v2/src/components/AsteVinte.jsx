@@ -79,6 +79,13 @@ function AsteVinte() {
                 className="bg-white rounded-lg shadow-md p-6 flex flex-col min-h-[200px] 
               transform transition-all duration-300 hover:scale-105"
               >
+
+                <div className="absolute -top-3 -right-3 bg-green-500 text-white px-4 py-1 
+                  rounded-full text-sm font-medium shadow-lg">
+                  Vinta
+                </div>
+
+
                 <h3 className="text-xl font-semibold mb-4">{asta.nomeItem}</h3>
                 <div className="space-y-2">
                   <p className="text-gray-700">

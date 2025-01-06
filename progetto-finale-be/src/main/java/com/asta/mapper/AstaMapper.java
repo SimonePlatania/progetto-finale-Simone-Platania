@@ -97,4 +97,8 @@ public interface AstaMapper {
 	        "JOIN offerte o ON o.asta_id = a.id " +
 	        "WHERE o.utente_id = #{userId}")  // Cambiato da user_id a utente_id
 	List<Asta> findAstePartecipate(@Param("userId") Long userId);
+	
+	    @Select("SELECT DISTINCT utente_id FROM offerte WHERE asta_id = #{astaId}")
+	    List<Long> findPartecipantiByAstaId(@Param("astaId") Long astaId);
+	    
 }

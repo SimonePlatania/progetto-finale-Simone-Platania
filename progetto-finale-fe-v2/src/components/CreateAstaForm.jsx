@@ -1,4 +1,3 @@
-// CreateAstaForm.jsx
 import { useState } from "react";
 
 function CreateAstaForm({ item, onClose, onSubmit }) {
@@ -13,44 +12,63 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     
     const now = new Date();
-    const start = formData.startNow ? now : new Date(formData.dataInizio);
     const end = new Date(formData.dataFine);
+    let start = formData.startNow ? now : new Date(formData.dataInizio);
 
-    if (!formData.startNow && !formData.dataInizio) {
-      setError("Data di inizio obbligatoria se l'asta non parte subito");
-      return;
+    try {
+      if (!formData.startNow && !formData.dataInizio) {
+        setError("Data di inizio obbligatoria se l'asta non parte subito");
+        return;
+      }
+
+      if (!formData.dataFine) {
+        setError("Data di fine obbligatoria");
+        return;
+      }
+
+      if (end < start) {
+        setError("La data di fine non può essere precedente alla data di inizio");
+        return;
+      }
+
+      if (!formData.startNow && start < now) {
+        setError("La data di inizio deve essere futura");
+        return;
+      }
+
+      const durationMinutes = Math.floor((end - start) / (1000 * 60));
+      if (durationMinutes < 5) {
+        setError("L'asta deve durare almeno 5 minuti");
+        return;
+      }
+
+      const dataToSubmit = {
+        itemId: formData.itemId,
+        nomeItem: formData.nomeItem,
+        dataInizio: formData.startNow ? now.toISOString() : formData.dataInizio,
+        dataFine: formData.dataFine,
+        startNow: formData.startNow
+      };
+
+      console.log("Dati che stiamo inviando:", dataToSubmit);
+
+      await onSubmit(dataToSubmit);
+      onClose();
+    } catch (err) {
+      console.error("Errore completo:", err);
+      console.error("Risposta del server:", err.response?.data);
+      console.error("Status code:", err.response?.status);
+      
+      setError(
+        err.response?.data || 
+        err.message || 
+        "Errore nella creazione dell'asta"
+      );
     }
-
-    if (!formData.dataFine) {
-      setError("Data di fine obbligatoria");
-      return;
-    }
-
-    if (end < start) {
-      setError("La data di fine non può essere precedente alla data di inizio");
-      return;
-    }
-
-    if (!formData.startNow && start < now) {
-      setError("La data di inizio deve essere futura");
-      return;
-    }
-
-    if ((end - start) < 300000) {
-      setError("L'asta deve durare almeno 5 minuti");
-      return;
-    }
-
-    const dataToSubmit = {
-      ...formData,
-      dataInizio: formData.startNow ? null : formData.dataInizio,
-    };
-
-    await onSubmit(dataToSubmit);
   };
-
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
@@ -68,7 +86,7 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
               onChange={(e) => setFormData({
                 ...formData,
                 startNow: e.target.checked,
-                dataInizio: e.target.checked ? null : formData.dataInizio
+                dataInizio: e.target.checked ? "" : formData.dataInizio
               })}
               className="mr-2"
             />
@@ -107,10 +125,10 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
           </div>
 
           {error && (
-    <div className="text-red-500 text-sm mb-4">
-      {error}
-    </div>
-  )}
+            <div className="text-red-500 text-sm mb-4">
+              {error}
+            </div>
+          )}
 
           <div className="flex justify-end gap-4 mt-6">
             <button

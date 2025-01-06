@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import NotificationBell from "./NotificationBell";
+
 
 function Homepage() {
   const [user, setUser] = useState(null);
@@ -87,7 +89,9 @@ function Homepage() {
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-gray-900">Sistema Aste</h1>
             
-            <div className="flex items-center space-x-4">
+             <div className="flex items-center space-x-4">
+              {/* Prima la campanella */}
+              <NotificationBell userId={user?.id} />
               {/* Navigazione per Gestore */}
               {user?.ruolo === "GESTORE" && (
                 <button
@@ -115,6 +119,8 @@ function Homepage() {
                   </button>
                 </div>
               )}
+
+              
 
               {/* Info Utente e Logout */}
               <div className="flex items-center space-x-4 border-l pl-4">
