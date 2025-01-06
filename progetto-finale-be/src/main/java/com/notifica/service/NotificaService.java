@@ -102,7 +102,6 @@ public class NotificaService {
         }
     }
 
-    // Aggiungi questi due metodi
     public List<Notifica> getNotificheUtente(Long userId) {
         return notificaMapper.findByUserId(userId);
     }
