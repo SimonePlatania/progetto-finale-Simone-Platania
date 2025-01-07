@@ -49,7 +49,6 @@ public class Asta {
 		this.isStartNow = isStartNow;
 	}
 	
-
 	public Long getId() {
 		return id;
 	}

@@ -37,7 +37,7 @@ public interface ItemMapper {
 		    List<Item> findAll();
 
 	// 27/12/2024 Simone MAPPER RICERCA ID TRAMITE PARAMETRO ID 2)
-	 @Select("SELECT * FROM items WHERE id = #{id} AND deleted = false")
+	  @Select("SELECT * FROM items WHERE id = #{id}")
 	    @Results({
 	        @Result(property = "id", column = "id"),
 	        @Result(property = "nome", column = "nome"),
@@ -47,11 +47,28 @@ public interface ItemMapper {
 	        @Result(property = "dataCreazione", column = "data_creazione"),
 	        @Result(property = "inAsta", column = "in_asta"),
 	        @Result(property = "gestoreId", column = "gestore_id"),
+	        @Result(property = "deleted", column = "deleted"),
 	        @Result(property = "gestoreUsername", column = "gestore_username",
 	                one = @One(select = "com.login.mapper.UtenteMapper.findUsernameById"))
 	    })
 	    Item findById(@Param("id") Long id);
-	 
+
+	    @Select("SELECT * FROM items WHERE id = #{id} AND deleted = false")
+	    @Results({
+	        @Result(property = "id", column = "id"),
+	        @Result(property = "nome", column = "nome"),
+	        @Result(property = "descrizione", column = "descrizione"),
+	        @Result(property = "prezzoBase", column = "prezzo_base"),
+	        @Result(property = "rilancioMinimo", column = "rilancio_minimo"),
+	        @Result(property = "dataCreazione", column = "data_creazione"),
+	        @Result(property = "inAsta", column = "in_asta"),
+	        @Result(property = "gestoreId", column = "gestore_id"),
+	        @Result(property = "deleted", column = "deleted"),
+	        @Result(property = "gestoreUsername", column = "gestore_username",
+	                one = @One(select = "com.login.mapper.UtenteMapper.findUsernameById"))
+	    })
+	    Item findByIdActive(@Param("id") Long id);
+	
 	 
 	// 27/12/2024 Simone MAPPER INSERIMENTO OGGETTO NEL DATABASE 3)
 	 @Insert("INSERT INTO items (nome, descrizione, prezzo_base, rilancio_minimo, " +
@@ -71,6 +88,7 @@ public interface ItemMapper {
 	// 27/12/2024 Simone RIMOZIONE OGGETTO TRAMITE IL SUO ID 5)
     @Update("UPDATE items SET deleted = true WHERE id = #{id}")
     void delete(@Param("id") Long id);
+    
 	// 27/12/2024 Simone CONTEGGIO DELLE OFFERTE 6)
     @Select("SELECT COUNT(*) FROM offerte o " +
             "JOIN items i ON o.item_id = i.id " +

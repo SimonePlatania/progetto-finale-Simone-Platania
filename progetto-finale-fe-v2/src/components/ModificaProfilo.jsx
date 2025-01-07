@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import '../css/Auth.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import "../css/Auth.css";
 
 function ModificaProfilo() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({
     username: "",
-    email: ""
+    email: "",
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -25,13 +25,16 @@ function ModificaProfilo() {
 
     const fetchUser = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/utenti/me", {
-          headers: { Authorization: sessionId }
-        });
+        const response = await axios.get(
+          "http://localhost:8080/api/utenti/me",
+          {
+            headers: { Authorization: sessionId },
+          }
+        );
         setUser(response.data);
         setFormData({
           username: response.data.username,
-          email: response.data.email
+          email: response.data.email,
         });
       } catch (err) {
         console.error("Errore nel caricamento dati utente:", err);
@@ -80,11 +83,9 @@ function ModificaProfilo() {
         return;
       }
 
-      await axios.put(
-        `http://localhost:8080/api/utenti/${user.id}`, 
-        formData,
-        { headers: { Authorization: sessionId } }
-      );
+      await axios.put(`http://localhost:8080/api/utenti/${user.id}`, formData, {
+        headers: { Authorization: sessionId },
+      });
       setSuccess("Profilo aggiornato con successo!");
       setTimeout(() => navigate("/homepage"), 2000);
     } catch (err) {
@@ -95,8 +96,10 @@ function ModificaProfilo() {
   return (
     <div className="mio-div">
       <form className="form" onSubmit={handleSubmit}>
-        <h2 className="text-3xl font-bold text-center mb-8">Modifica Profilo</h2>
-        <br/>
+        <h2 className="text-3xl font-bold text-center mb-8">
+          Modifica Profilo
+        </h2>
+        <br />
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -105,13 +108,15 @@ function ModificaProfilo() {
         )}
 
         {success && (
-          <div style={{ 
-            background: "rgba(34, 197, 94, 0.1)", 
-            color: "#22c55e",
-            padding: "12px",
-            borderRadius: "8px",
-            marginBottom: "16px"
-          }}>
+          <div
+            style={{
+              background: "rgba(34, 197, 94, 0.1)",
+              color: "#22c55e",
+              padding: "12px",
+              borderRadius: "8px",
+              marginBottom: "16px",
+            }}
+          >
             {success}
           </div>
         )}
@@ -121,7 +126,9 @@ function ModificaProfilo() {
             type="text"
             name="username"
             value={formData.username}
-            onChange={(e) => setFormData({...formData, username: e.target.value})}
+            onChange={(e) =>
+              setFormData({ ...formData, username: e.target.value })
+            }
             className="w-full"
             placeholder="Username"
             required
@@ -133,24 +140,22 @@ function ModificaProfilo() {
             type="email"
             name="email"
             value={formData.email}
-            onChange={(e) => setFormData({...formData, email: e.target.value})}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
             className="w-full"
             placeholder="Email"
             required
           />
         </div>
 
-        <button 
-          type="submit" 
-          className="btn registrati"
-          disabled={isDisabled}
-        >
+        <button type="submit" className="btn registrati" disabled={isDisabled}>
           Salva Modifiche
         </button>
-        <br/>
+        <br />
 
         <div className="mt-6 text-center">
-          <button 
+          <button
             type="button"
             onClick={() => navigate("/homepage")}
             className="btn reset"

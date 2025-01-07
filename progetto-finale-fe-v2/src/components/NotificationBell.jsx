@@ -1,87 +1,159 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useNotifications } from '../hooks/useNotifications';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useNotifications } from "../hooks/useNotifications";
+import {
+  Bell,
+  Trophy,
+  Clock,
+  Users,
+  ArrowUpCircle,
+  Ban,
+  Info,
+} from "lucide-react";
+
+const TIPI_NOTIFICA = {
+  NUOVA_OFFERTA: "NUOVA_OFFERTA",
+  ASTA_SCADUTA: "ASTA_SCADUTA",
+  PARTECIPAZIONE_ASTA: "PARTECIPAZIONE_ASTA",
+  ASTA_VINTA: "ASTA_VINTA",
+  ASTA_TERMINATA: "ASTA_TERMINATA",
+  OFFERTA_SUPERATA: "OFFERTA_SUPERATA"
+};
 
 const NotificationBell = ({ userId }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const navigate = useNavigate();
-    const { notifications, isConnected, markAsRead } = useNotifications(userId);
+  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const { notifications, isConnected, markAsRead } = useNotifications(userId);
 
-    const unreadCount = notifications.filter(n => !n.letta).length;
+  const unreadCount = notifications.filter((n) => !n.letta).length;
 
-    const handleNotificationClick = async (notifica) => {
-        if (notifica.astaId) {
-            await markAsRead(notifica.id);
-            navigate(`/asta/${notifica.astaId}`);
-            setIsOpen(false);
-        }
+  const handleNotificationClick = async (notifica) => {
+    if (notifica.astaId) {
+      await markAsRead(notifica.id);
+      navigate(`/asta/${notifica.astaId}`);
+      setIsOpen(false);
+    }
+  };
+
+  // Enhanced notification type handling with icons and colors
+  const getNotificationConfig = (tipo) => {
+    const configs = {
+      [TIPI_NOTIFICA.NUOVA_OFFERTA]: {
+        icon: <ArrowUpCircle className="w-5 h-5 text-blue-500" />,
+        bgColor: "bg-blue-50",
+        borderColor: "border-blue-100"
+      },
+      [TIPI_NOTIFICA.ASTA_SCADUTA]: {
+        icon: <Clock className="w-5 h-5 text-orange-500" />,
+        bgColor: "bg-orange-50",
+        borderColor: "border-orange-100"
+      },
+      [TIPI_NOTIFICA.PARTECIPAZIONE_ASTA]: {
+        icon: <Users className="w-5 h-5 text-indigo-500" />,
+        bgColor: "bg-indigo-50",
+        borderColor: "border-indigo-100"
+      },
+      [TIPI_NOTIFICA.ASTA_VINTA]: {
+        icon: <Trophy className="w-5 h-5 text-yellow-500" />,
+        bgColor: "bg-yellow-50",
+        borderColor: "border-yellow-100"
+      },
+      [TIPI_NOTIFICA.ASTA_TERMINATA]: {
+        icon: <Ban className="w-5 h-5 text-red-500" />,
+        bgColor: "bg-red-50",
+        borderColor: "border-red-100"
+      },
+      [TIPI_NOTIFICA.OFFERTA_SUPERATA]: {
+        icon: <ArrowUpCircle className="w-5 h-5 text-purple-500" />,
+        bgColor: "bg-purple-50",
+        borderColor: "border-purple-100"
+      },
+      DEFAULT: {
+        icon: <Info className="w-5 h-5 text-gray-500" />,
+        bgColor: "bg-gray-50",
+        borderColor: "border-gray-100"
+      }
     };
 
-    const getNotificationIcon = (tipo) => {
-        switch(tipo) {
-            case 'NUOVA_OFFERTA':
-                return '💰';
-            case 'ASTA_SCADUTA':
-                return '⏰';
-            case 'PARTECIPAZIONE_ASTA':
-                return '👤';
-            default:
-                return '📋';
-        }
-    };
+    console.log('Tipo notifica ricevuto:', tipo); // Aggiunto per debug
+    return configs[tipo] || configs.DEFAULT;
+  };
 
-    return (
-        <div className="relative">
-            <button onClick={() => setIsOpen(!isOpen)} 
-                    className="relative p-2 text-gray-600 hover:text-gray-800">
-                <svg xmlns="http://www.w3.org/2000/svg" 
-                     className="w-6 h-6"
-                     viewBox="0 0 24 24" 
-                     fill="none" 
-                     stroke="currentColor">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                </svg>
-                {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                        {unreadCount}
-                    </span>
-                )}
-            </button>
+  const formatNotificationTime = (date) => {
+    const now = new Date();
+    const notificationDate = new Date(date);
+    const diffInMinutes = Math.floor((now - notificationDate) / (1000 * 60));
 
-            {isOpen && (
-                <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                    <div className="p-2 border-b border-gray-200 font-semibold">
-                        Notifiche
-                    </div>
-                    <div className="max-h-96 overflow-y-auto">
-                        {notifications.length > 0 ? (
-                            notifications.map((notifica, index) => (
-                                <div
-                                    key={notifica.id || index}
-                                    onClick={() => handleNotificationClick(notifica)}
-                                    className={`p-3 border-b hover:bg-gray-50 cursor-pointer
-                                        ${notifica.letta ? 'bg-white' : 'bg-blue-50'}`}
-                                >
-                                    <span className="mr-2">{getNotificationIcon(notifica.tipo)}</span>
-                                    <p className="text-sm text-gray-800">
-                                        {notifica.messaggio}
-                                    </p>
-                                    <span className="text-xs text-gray-500">
-                                        {new Date(notifica.data).toLocaleString()}
-                                    </span>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="p-4 text-center text-gray-500">
-                                Nessuna notifica
-                            </div>
-                        )}
-                    </div>
-                </div>
+    if (diffInMinutes < 1) return "Proprio ora";
+    if (diffInMinutes < 60) return `${diffInMinutes}m fa`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h fa`;
+    return notificationDate.toLocaleDateString();
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="relative p-2 text-gray-600 hover:text-gray-800 transition-colors"
+      >
+        <Bell className="w-6 h-6" />
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+            {unreadCount}
+          </span>
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+          <div className="p-3 border-b border-gray-200 font-semibold flex justify-between items-center">
+            <span>Notifiche</span>
+            {isConnected && (
+              <span className="text-xs text-green-500 flex items-center">
+                <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                Connesso
+              </span>
             )}
+          </div>
+
+          <div className="max-h-[32rem] overflow-y-auto">
+            {notifications.length > 0 ? (
+              notifications.map((notifica, index) => {
+                console.log('Notifica completa:', notifica); 
+                const config = getNotificationConfig(notifica.tipo);
+                return (
+                  <div
+                    key={notifica.id || index}
+                    onClick={() => handleNotificationClick(notifica)}
+                    className={`p-4 border-b hover:bg-gray-50 cursor-pointer transition-colors
+                      ${!notifica.letta ? config.bgColor : "bg-white"}
+                      ${config.borderColor}`}
+                  >
+                    <div className="flex items-start space-x-3">
+                      <div className="flex-shrink-0 mt-1">{config.icon}</div>
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-800">
+                          {notifica.messaggio}
+                        </p>
+                        <span className="text-xs text-gray-500 mt-1 block">
+                          {formatNotificationTime(notifica.data)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="p-8 text-center text-gray-500">
+                <Bell className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p>Nessuna notifica</p>
+              </div>
+            )}
+          </div>
         </div>
-    );
+      )}
+    </div>
+  );
 };
 
 export default NotificationBell;

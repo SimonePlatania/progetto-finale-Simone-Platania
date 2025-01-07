@@ -20,9 +20,12 @@ function AsteVinte() {
     const fetchData = async () => {
       try {
         // Carica i dati dell'utente
-        const userResponse = await axios.get("http://localhost:8080/api/utenti/me", {
-          headers: { Authorization: sessionId }
-        });
+        const userResponse = await axios.get(
+          "http://localhost:8080/api/utenti/me",
+          {
+            headers: { Authorization: sessionId },
+          }
+        );
         const userData = userResponse.data;
         setUser(userData);
 
@@ -51,8 +54,8 @@ function AsteVinte() {
   if (loading) return <div>Caricamento...</div>;
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow">
+    <div className="min-h-screen bg-gray-100 rounded-md">
+      <header className="bg-white shadow rounded-md">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <button
             onClick={() => navigate("/homepage")}
@@ -66,7 +69,7 @@ function AsteVinte() {
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <h2 className="text-2xl font-bold mb-6">Le Tue Aste Vinte</h2>
-        
+
         {error && <div className="text-red-600 mb-4">{error}</div>}
 
         {asteVinte.length === 0 ? (
@@ -79,12 +82,12 @@ function AsteVinte() {
                 className="bg-white rounded-lg shadow-md p-6 flex flex-col min-h-[200px] 
               transform transition-all duration-300 hover:scale-105"
               >
-
-                <div className="absolute -top-3 -right-3 bg-green-500 text-white px-4 py-1 
-                  rounded-full text-sm font-medium shadow-lg">
+                <div
+                  className="absolute -top-3 -right-3 bg-green-500 text-white px-4 py-1 
+                  rounded-full text-sm font-medium shadow-lg"
+                >
                   Vinta
                 </div>
-
 
                 <h3 className="text-xl font-semibold mb-4">{asta.nomeItem}</h3>
                 <div className="space-y-2">
@@ -94,9 +97,13 @@ function AsteVinte() {
                   <p className="text-gray-600">
                     Data Fine: {new Date(asta.dataFine).toLocaleString()}
                   </p>
-                  <p className={`font-semibold ${asta.isAttiva ? 'text-green-600' : 'text-red-600'}`}>
-                  {asta.isAttiva ? 'In Corso' : 'Terminata'}
-                </p>
+                  <p
+                    className={`font-semibold ${
+                      asta.isAttiva ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {asta.isAttiva ? "In Corso" : "Terminata"}
+                  </p>
                 </div>
               </div>
             ))}

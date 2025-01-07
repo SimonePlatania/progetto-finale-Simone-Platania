@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.asta.entity.Asta;
+import com.asta.mapper.AstaMapper;
 import com.item.entity.Item;
 import com.item.exception.ItemNotFoundException;
 import com.item.mapper.ItemMapper;
@@ -20,10 +22,12 @@ public class ItemService {
 
     private final ItemMapper itemMapper;
     private final UtenteMapper utenteMapper;
+    private final AstaMapper astaMapper;
 
-    public ItemService(ItemMapper itemMapper, UtenteMapper utenteMapper) {
+    public ItemService(ItemMapper itemMapper, UtenteMapper utenteMapper, AstaMapper astaMapper) {
         this.itemMapper = itemMapper;
         this.utenteMapper = utenteMapper;
+        this.astaMapper = astaMapper;
     }
 
     @Transactional
@@ -68,6 +72,21 @@ public class ItemService {
             throw new IllegalArgumentException("Il rilancio minimo è obbligatorio");
         }
     }
+    
+    public Asta getDettaglioAsta(Long astaId) {
+        Asta asta = astaMapper.findById(astaId);
+        
+        // Controllo aggiuntivo sull'item
+        Item item = itemMapper.findById(asta.getItemId());
+        
+        if (item == null) {
+            // L'item è stato eliminato o non è più disponibile
+            asta.setStato("ITEM_ELIMINATO");
+            return asta;
+        }
+        
+        return asta;
+    }
 
     private boolean isGestore(Long userId) {
         Utente utente = utenteMapper.findById(userId);
@@ -93,14 +112,6 @@ public class ItemService {
 		itemMapper.delete(itemId);
 	}
 
-	public Item getItemById(Long id) {
-		Item item = itemMapper.findById(id);
-		if (item == null) {
-			throw new ItemNotFoundException("Item non trovato con id: " + id);
-		}
-		return item;
-	}
-
 	public List<Item> findByGestoreId(Long gestoreId) {
 		return itemMapper.findByGestoreId(gestoreId);
 	}
@@ -108,4 +119,21 @@ public class ItemService {
 	public List<Item> findAll() {
 	    return itemMapper.findAll();
 	}
+	
+	 public Item getItemById(Long id) {
+	        Item item = itemMapper.findById(id);
+	        if (item == null) {
+	            throw new ItemNotFoundException("Item non trovato con id: " + id);
+	        }
+	        return item;
+	    }
+
+	    public Item getActiveItemById(Long id) {
+	        Item item = itemMapper.findByIdActive(id);
+	        if (item == null) {
+	            throw new ItemNotFoundException("Item attivo non trovato con id: " + id);
+	        }
+	        return item;
+	    }
+
 }

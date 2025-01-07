@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import CreateAstaForm from "./CreateAstaForm";  // Aggiungi questa riga!
-
+import CreateAstaForm from "./CreateAstaForm";
 
 function GestoreItems() {
   const [user, setUser] = useState(null);
@@ -15,7 +14,7 @@ function GestoreItems() {
     nome: "",
     descrizione: "",
     prezzoBase: "",
-    rilancioMinimo: ""
+    rilancioMinimo: "",
   });
   const [error, setError] = useState("");
 
@@ -31,9 +30,12 @@ function GestoreItems() {
     const fetchData = async () => {
       try {
         // Verifica utente
-        const userResponse = await axios.get("http://localhost:8080/api/utenti/me", {
-          headers: { Authorization: sessionId }
-        });
+        const userResponse = await axios.get(
+          "http://localhost:8080/api/utenti/me",
+          {
+            headers: { Authorization: sessionId },
+          }
+        );
         const userData = userResponse.data;
         setUser(userData);
 
@@ -66,11 +68,11 @@ function GestoreItems() {
         {
           ...nuovoItem,
           prezzoBase: parseFloat(nuovoItem.prezzoBase),
-          rilancioMinimo: parseFloat(nuovoItem.rilancioMinimo)
+          rilancioMinimo: parseFloat(nuovoItem.rilancioMinimo),
         },
         {
           params: { gestoreId: user.id },
-          headers: { Authorization: localStorage.getItem("sessionId") }
+          headers: { Authorization: localStorage.getItem("sessionId") },
         }
       );
 
@@ -79,7 +81,7 @@ function GestoreItems() {
         nome: "",
         descrizione: "",
         prezzoBase: "",
-        rilancioMinimo: ""
+        rilancioMinimo: "",
       });
       setError("");
     } catch (err) {
@@ -91,7 +93,7 @@ function GestoreItems() {
     setSelectedItem(item);
     setShowAstaForm(true);
   };
-  
+
   const handleCreaAsta = async (formData) => {
     try {
       await axios.post(
@@ -102,14 +104,14 @@ function GestoreItems() {
           dataInizio: formData.startNow ? null : formData.dataInizio,
           dataFine: formData.dataFine,
           startNow: formData.startNow,
-          isAttiva: true  // Aggiungiamo questo campo
+          isAttiva: true
         },
         {
           params: { gestoreId: user.id },
-          headers: { Authorization: localStorage.getItem("sessionId") }
+          headers: { Authorization: localStorage.getItem("sessionId") },
         }
       );
-  
+
       // Ricarica items
       const response = await axios.get(
         `http://localhost:8080/api/items/gestore/${user.id}`,
@@ -122,7 +124,7 @@ function GestoreItems() {
       setError(err.response?.data || "Errore nella creazione dell'asta");
     }
   };
-  
+
   if (loading) return <div>Caricamento...</div>;
 
   return (
@@ -148,14 +150,18 @@ function GestoreItems() {
               type="text"
               placeholder="Nome item"
               value={nuovoItem.nome}
-              onChange={(e) => setNuovoItem({ ...nuovoItem, nome: e.target.value })}
+              onChange={(e) =>
+                setNuovoItem({ ...nuovoItem, nome: e.target.value })
+              }
               className="w-full p-2 border rounded-lg bg-gray-200"
               required
             />
             <textarea
               placeholder="Descrizione"
               value={nuovoItem.descrizione}
-              onChange={(e) => setNuovoItem({ ...nuovoItem, descrizione: e.target.value })}
+              onChange={(e) =>
+                setNuovoItem({ ...nuovoItem, descrizione: e.target.value })
+              }
               className="w-full p-2 border rounded-lg bg-gray-200"
             />
             <div className="grid grid-cols-2 gap-4">
@@ -164,7 +170,9 @@ function GestoreItems() {
                 step="0.01"
                 placeholder="Prezzo base"
                 value={nuovoItem.prezzoBase}
-                onChange={(e) => setNuovoItem({ ...nuovoItem, prezzoBase: e.target.value })}
+                onChange={(e) =>
+                  setNuovoItem({ ...nuovoItem, prezzoBase: e.target.value })
+                }
                 className="p-2 border rounded-lg bg-gray-200"
                 required
               />
@@ -173,7 +181,9 @@ function GestoreItems() {
                 step="0.01"
                 placeholder="Rilancio minimo"
                 value={nuovoItem.rilancioMinimo}
-                onChange={(e) => setNuovoItem({ ...nuovoItem, rilancioMinimo: e.target.value })}
+                onChange={(e) =>
+                  setNuovoItem({ ...nuovoItem, rilancioMinimo: e.target.value })
+                }
                 className="p-2 border rounded-lg bg-gray-200"
                 required
               />
@@ -207,22 +217,24 @@ function GestoreItems() {
                 </button>
               )}
               {item.inAsta && (
-                <p className="text-center text-green-600 font-semibold">In Asta</p>
+                <p className="text-center text-green-600 font-semibold">
+                  In Asta
+                </p>
               )}
             </div>
           ))}
         </div>
 
         {showAstaForm && selectedItem && (
-  <CreateAstaForm
-    item={selectedItem}
-    onClose={() => {
-      setShowAstaForm(false);
-      setSelectedItem(null);
-    }}
-    onSubmit={handleCreaAsta}
-  />
-)}
+          <CreateAstaForm
+            item={selectedItem}
+            onClose={() => {
+              setShowAstaForm(false);
+              setSelectedItem(null);
+            }}
+            onSubmit={handleCreaAsta}
+          />
+        )}
       </main>
     </div>
   );

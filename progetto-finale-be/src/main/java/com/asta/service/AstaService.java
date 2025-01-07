@@ -2,8 +2,8 @@ package com.asta.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,9 +29,6 @@ public class AstaService {
 	private final UtenteMapper utenteMapper;
 	private final NotificaService notificaService;
 	LocalDateTime now = LocalDateTime.now();
-	
-
-
 
 	public AstaService(AstaMapper astaMapper, ItemMapper itemMapper, OffertaMapper offertaMapper,
 			UtenteMapper utenteMapper, NotificaService notificaService) {
@@ -41,21 +38,21 @@ public class AstaService {
 		this.utenteMapper = utenteMapper;
 		this.notificaService = notificaService;
 	}
-	
+
 	public List<Asta> getAsteAttive() {
-	    List<Asta> asteAttive = astaMapper.findAsteAttive();
+		List<Asta> asteAttive = astaMapper.findAsteAttive();
 
-	    for (Asta asta : asteAttive) {
-	    	
-	        if (asta.getOffertaCorrenteId() != null) {
-	            Utente offerente = utenteMapper.findById(asta.getOffertaCorrenteId());
-	            if (offerente != null) {
-	                asta.setUsernameOfferente(offerente.getUsername());
-	            }
-	        }
-	    }
+		for (Asta asta : asteAttive) {
 
-	    return asteAttive;
+			if (asta.getOffertaCorrenteId() != null) {
+				Utente offerente = utenteMapper.findById(asta.getOffertaCorrenteId());
+				if (offerente != null) {
+					asta.setUsernameOfferente(offerente.getUsername());
+				}
+			}
+		}
+
+		return asteAttive;
 	}
 
 	public Asta findById(Long id) {
@@ -66,76 +63,77 @@ public class AstaService {
 	@Transactional
 	public Asta createAsta(CreaAstaRequest request, Long gestoreId) {
 		LocalDateTime now = LocalDateTime.now();
-	    System.out.println("Request ricevuta: " + request.getItemId());
-	    
-	    //06/01 Simone Avuti problemi durante la creazione dell'asta
-	    if (request.isStartNow() ) {
-	    	request.setDataInizio(now);
-	    }
-	    
-	    validateDates(request, now);
-	    validateAstaRequest(request);
+		System.out.println("Request ricevuta: " + request.getItemId());
 
-	    // Validazione e controllo dell'item
-	    Item item = itemMapper.findById(request.getItemId());
-	    System.out.println("Item trovato: " + item);
-	    if (item == null) {
-	        throw new RuntimeException("Item non trovato");
-	    }
+		// 06/01 Simone Avuti problemi durante la creazione dell'asta
+		if (request.isStartNow()) {
+			request.setDataInizio(now);
+		}
 
-	    System.out.println("Prezzo base: " + item.getPrezzoBase());
+		validateDates(request, now);
+		validateAstaRequest(request);
 
-	    if (item.getInAsta()) {
-	        throw new RuntimeException("Item già in asta");
-	    }
+		// Validazione e controllo dell'item
+		Item item = itemMapper.findById(request.getItemId());
+		System.out.println("Item trovato: " + item);
+		if (item == null) {
+			throw new RuntimeException("Item non trovato");
+		}
 
-	    if (!item.getGestoreId().equals(gestoreId)) {
-	        throw new RuntimeException("Non sei autorizzato a mettere questo item nell'asta");
-	    }
+		System.out.println("Prezzo base: " + item.getPrezzoBase());
 
-	    if (item.getPrezzoBase() == null) {
-	        throw new RuntimeException("L'item deve avere un prezzo base");
-	    }
+		if (item.getInAsta()) {
+			throw new RuntimeException("Item già in asta");
+		}
 
-	    if (request.isStartNow()) {
-	        request.setDataInizio(now);
-	    }
+		if (!item.getGestoreId().equals(gestoreId)) {
+			throw new RuntimeException("Non sei autorizzato a mettere questo item nell'asta");
+		}
 
-	    Asta asta = new Asta();
-	    asta.setItemId(request.getItemId());
-	    asta.setDataInizio(request.getDataInizio());
-	    asta.setDataFine(request.getDataFine());
-	    asta.setStato("CREATA");
-	    asta.setIsAttiva(true);
-	    asta.setNomeItem(item.getNome());
-	    asta.setStartNow(request.isStartNow());
+		if (item.getPrezzoBase() == null) {
+			throw new RuntimeException("L'item deve avere un prezzo base");
+		}
 
-	    astaMapper.insert(asta);
-	    item.setInAsta(true);
-	    itemMapper.update(item);
+		if (request.isStartNow()) {
+			request.setDataInizio(now);
+		}
 
-	    return asta;
+		Asta asta = new Asta();
+		asta.setItemId(request.getItemId());
+		asta.setDataInizio(request.getDataInizio());
+		asta.setDataFine(request.getDataFine());
+		asta.setStato("CREATA");
+		asta.setIsAttiva(true);
+		asta.setNomeItem(item.getNome());
+		asta.setStartNow(request.isStartNow());
+
+		astaMapper.insert(asta);
+		item.setInAsta(true);
+		itemMapper.update(item);
+
+		return asta;
 	}
+
 	private void validateDates(CreaAstaRequest request, LocalDateTime now) {
-	    if (request.getDataFine() == null) {
-	        throw new RuntimeException("La data di fine è obbligatoria");
-	    }
-	    
-	    LocalDateTime startReference = request.isStartNow() ? now : request.getDataInizio();
+		if (request.getDataFine() == null) {
+			throw new RuntimeException("La data di fine è obbligatoria");
+		}
 
-	    if (!request.isStartNow() && (request.getDataInizio() == null || request.getDataInizio().isBefore(now))) {
-	        throw new RuntimeException("La data di inizio non può essere nel passato o nulla quando non vuoi startare immeditamente l'asta");
-	        }
+		LocalDateTime startReference = request.isStartNow() ? now : request.getDataInizio();
 
+		if (!request.isStartNow() && (request.getDataInizio() == null || request.getDataInizio().isBefore(now))) {
+			throw new RuntimeException(
+					"La data di inizio non può essere nel passato o nulla quando non vuoi startare immeditamente l'asta");
+		}
 
-	    if (request.getDataFine().isBefore(startReference)) {
-	        throw new RuntimeException("La data di fine deve essere successiva alla data di inizio");
-	    }
+		if (request.getDataFine().isBefore(startReference)) {
+			throw new RuntimeException("La data di fine deve essere successiva alla data di inizio");
+		}
 
-	    long durataMinuti = java.time.temporal.ChronoUnit.MINUTES.between(startReference, request.getDataFine());
-	    if (durataMinuti < 5) {
-	        throw new RuntimeException("L'asta deve durare almeno 5 minuti");
-	    }
+		long durataMinuti = java.time.temporal.ChronoUnit.MINUTES.between(startReference, request.getDataFine());
+		if (durataMinuti < 5) {
+			throw new RuntimeException("L'asta deve durare almeno 5 minuti");
+		}
 	}
 
 	// 28/12/2024 Simone TUTTE LE VALIDAZIONI NECESSARIE 2)
@@ -148,10 +146,10 @@ public class AstaService {
 		if (request.getDataFine() == null) {
 			throw new IllegalArgumentException("Data di fine deve essere specificata");
 		}
-		
+
 		if (request.getDataFine().isBefore(request.getDataInizio())) {
 			throw new IllegalArgumentException("La data di fine non può essere precedente a quella d'inizio");
-			
+
 		}
 
 		if (!request.isStartNow() && request.getDataInizio().isBefore(now)) {
@@ -176,7 +174,7 @@ public class AstaService {
 		if (asta.getDataFine().isBefore(now)) {
 			throw new RuntimeException("Asta terminata");
 		}
-		
+
 		if (userId.equals(asta.getOffertaCorrenteId())) {
 			throw new RuntimeException("Non puoi fare un'offerta se sei già l'ultimo offertente");
 		}
@@ -195,6 +193,10 @@ public class AstaService {
 
 		}
 
+		if (asta.getOffertaCorrenteId() != null) {
+			notificaService.inviaNotificaOffertaSuperata(astaId, asta.getOffertaCorrenteId(), importoOfferta);
+		}
+
 		Offerta offerta = new Offerta();
 		offerta.setAstaId(astaId);
 		offerta.setItemId(asta.getItemId());
@@ -207,20 +209,17 @@ public class AstaService {
 		asta.setOffertaCorrente(importoOfferta);
 		asta.setOffertaCorrenteId(userId);
 		astaMapper.updateOfferta(asta);
-		
-		 	item = itemMapper.findById(asta.getItemId());
-		    String usernameOfferente = utenteMapper.findById(userId).getUsername();
-		    notificaService.inviaNotificaPartecipazione(astaId, userId, item.getGestoreId(), usernameOfferente);
 
-		
-		    List<Long> partecipanti = astaMapper.findPartecipantiByAstaId(astaId);
-		    for (Long partecipanteId : partecipanti) {
-		        if (!partecipanteId.equals(userId)) {
-		            notificaService.inviaNotificaOfferta(astaId, userId, importoOfferta);
-		        }
-		    }
-		
-		
+		String usernameOfferente = utenteMapper.findById(userId).getUsername();
+		notificaService.inviaNotificaPartecipazione(astaId, userId, item.getGestoreId(), usernameOfferente);
+
+		List<Long> partecipanti = astaMapper.findPartecipantiByAstaId(astaId);
+		for (Long partecipanteId : partecipanti) {
+			if (!partecipanteId.equals(userId)) {
+				notificaService.inviaNotificaOfferta(astaId, partecipanteId, importoOfferta);
+			}
+		}
+
 		if (asta.getDataFine().minusMinutes(5).isBefore(now)) {
 			for (Long partecipanteId : partecipanti) {
 				notificaService.inviaNotificaScadenza(astaId, partecipanteId);
@@ -229,49 +228,72 @@ public class AstaService {
 	}
 
 	public List<OffertaDTO> getStoricoOfferte(Long astaId, Long userId) {
-		Utente utente = utenteMapper.findById(userId);
-		boolean isGestore = "GESTORE".equals(utente.getRuolo());
+	    Utente utente = utenteMapper.findById(userId);
+	    boolean isGestore = "GESTORE".equals(utente.getRuolo());
+	    
+	    System.out.println("Recupero offerte per asta: " + astaId + ", utente: " + userId + 
+	                      " (isGestore: " + isGestore + ")");
 
-		List<Offerta> offerte = offertaMapper.findByAstaId(astaId);
+	    List<Offerta> offerte = offertaMapper.findByAstaId(astaId);
+	    List<OffertaDTO> risultato = new ArrayList<>();
 
-		return offerte.stream().map(offerta -> OffertaDTO.fromOfferta(offerta, isGestore)).collect(Collectors.toList());
+	    for (Offerta offerta : offerte) {
+	        OffertaDTO dto = OffertaDTO.fromOfferta(offerta, isGestore, userId);
+	        System.out.println("Offerta ID: " + offerta.getId() + 
+	                          ", UtenteId: " + offerta.getUtenteId() + 
+	                          ", isCurrentUser: " + dto.getCurrentUserOfferta());
+	        risultato.add(dto);
+	    }
+
+	    return risultato;
 	}
 
 	// 28/12/2024 Simone SERVICE PER POTER TERMINARE UN'ASTA 4)
 	@Transactional
 	public void terminaAsta(Long astaId, Long gestoreId) {
-	    Asta asta = astaMapper.findById(astaId);
+		Asta asta = astaMapper.findById(astaId);
 
-	    if (asta == null) {
-	        throw new RuntimeException("Asta non trovata");
-	    }
+		if (asta == null) {
+			throw new RuntimeException("Asta non trovata");
+		}
 
-	    if (gestoreId != null) {
-	        Item item = itemMapper.findById(asta.getItemId());
-	        if (!item.getGestoreId().equals(gestoreId)) {
-	            throw new RuntimeException("Non sei autorizzato a terminare questa asta");
-	        }
-	    }
+		if (gestoreId != null) {
+			Item item = itemMapper.findById(asta.getItemId());
+			if (!item.getGestoreId().equals(gestoreId)) {
+				throw new RuntimeException("Non sei autorizzato a terminare questa asta");
+			}
+		}
 
-	    asta.setIsAttiva(false);
-	    asta.setStato("TERMINATA");
-	    astaMapper.update(asta);
+		asta.setIsAttiva(false);
+		asta.setStato("TERMINATA");
+		astaMapper.update(asta);
 
-	    Item item = itemMapper.findById(asta.getItemId());
-	    item.setInAsta(false);
-	    
-	    // Se c'è stato un vincitore, marca l'item come deleted
-	    if (asta.getOffertaCorrenteId() != null) {
-	        item.setDeleted(true);
-	    }
-	    
-	    itemMapper.update(item);
+		if (asta.getOffertaCorrenteId() != null) {
+			notificaService.inviaNotificaVincitore(astaId, asta.getOffertaCorrenteId(), asta.getOffertaCorrente());
+		}
+
+		// 07/01 Simone Qui avevo la necessità di notificare tutti i partecipanti della
+		// chiusura dell'asta
+		List<Long> partecipanti = astaMapper.findPartecipantiByAstaId(astaId);
+		String motivoTerminazione = gestoreId != null ? "Terminata dal gestore" : "Asta conclusa per tempo scaduto";
+
+		for (Long partecipanteId : partecipanti) {
+			if (!partecipanteId.equals(asta.getOffertaCorrenteId())) {
+				notificaService.inviaNotificaTerminazioneAsta(astaId, partecipanteId, motivoTerminazione);
+			}
+		}
+
+		Item item = itemMapper.findById(asta.getItemId());
+		item.setInAsta(false);
+		if (asta.getOffertaCorrenteId() != null) {
+			item.setDeleted(true);
+		}
+		itemMapper.update(item);
 	}
 
 	// 28/12/2024 Simone SERVICE PER IL CONTROLLO DELLE ASTE SCADUTE 5)
 	@Transactional
 	public void checkAsteScadute() {
-		// Aggiungiamo log per debug
 		LocalDateTime now = LocalDateTime.now();
 		System.out.println("Checking aste scadute at: " + now);
 
@@ -288,10 +310,9 @@ public class AstaService {
 	public List<Asta> getAsteVinte(Long userId) {
 		return astaMapper.findAsteVinte(userId);
 	}
-	
+
 	public List<Asta> getAstePartecipate(Long userId) {
 		return astaMapper.findAstePartecipate(userId);
 	}
-	
 
 }

@@ -2,6 +2,7 @@ package com.asta.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
 import com.asta.entity.Offerta;
 
 public class OffertaDTO {
@@ -12,14 +13,19 @@ public class OffertaDTO {
     private BigDecimal importo;
     private LocalDateTime dataOfferta;
     private String usernameOfferente; 
+    private boolean currentUserOfferta;
+    
+    //07/01 Stavo avendo problemi a visualizzare se l'offerta l'avessi fatta io
 
     public OffertaDTO() {}
 
-    public static OffertaDTO fromOfferta(Offerta offerta, boolean isGestore) {
+    public static OffertaDTO fromOfferta(Offerta offerta, boolean isGestore, Long currentUserId) {
         OffertaDTO dto = new OffertaDTO();
         dto.setId(offerta.getId());
         dto.setImporto(offerta.getImporto());
         dto.setDataOfferta(offerta.getDataOfferta());
+        
+        dto.setCurrentUserOfferta(offerta.getUtenteId().equals(currentUserId));
         
         if (isGestore) {
             dto.setUsernameOfferente(offerta.getUsernameOfferente());
@@ -27,8 +33,17 @@ public class OffertaDTO {
         
         return dto;
     }
+    
+    
+	public boolean getCurrentUserOfferta() {
+		return currentUserOfferta;
+	}
 
-    public Long getId() {
+	public void setCurrentUserOfferta(boolean currentUserOfferta) {
+		this.currentUserOfferta = currentUserOfferta;
+	}
+
+	public Long getId() {
         return id;
     }
 

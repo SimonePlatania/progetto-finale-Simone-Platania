@@ -19,12 +19,14 @@ function AstePartecipate() {
     const fetchData = async () => {
       try {
         // Verifica utente
-        const userResponse = await axios.get("http://localhost:8080/api/utenti/me", {
-          headers: { Authorization: sessionId }
-        });
+        const userResponse = await axios.get(
+          "http://localhost:8080/api/utenti/me",
+          {
+            headers: { Authorization: sessionId },
+          }
+        );
         setUser(userResponse.data);
 
-        // Carica aste partecipate
         const asteResponse = await axios.get(
           `http://localhost:8080/api/aste/partecipate/${userResponse.data.id}`,
           { headers: { Authorization: sessionId } }
@@ -43,8 +45,8 @@ function AstePartecipate() {
   if (loading) return <div>Caricamento...</div>;
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow">
+    <div className="min-h-screen bg-gray-100 rounded-md">
+      <header className="bg-white shadow rounded-md">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <button
             onClick={() => navigate("/homepage")}
@@ -74,18 +76,21 @@ function AstePartecipate() {
                 <p className="text-gray-600">
                   Scadenza: {new Date(asta.dataFine).toLocaleString()}
                 </p>
-                <p className={`font-semibold ${asta.isAttiva ? 'text-green-600' : 'text-red-600'}`}>
-                  {asta.isAttiva ? 'In Corso' : 'Terminata'}
+                <p
+                  className={`font-semibold ${
+                    asta.isAttiva ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {asta.isAttiva ? "In Corso" : "Terminata"}
                 </p>
               </div>
-              {asta.isAttiva && (
-  <button
-    onClick={() => navigate(`/asta/${asta.id}`)}
-    className="mt-4 w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-  >
-    Visualizza Dettagli
-  </button>
-)}
+
+              <button
+                onClick={() => navigate(`/asta/${asta.id}`)}
+                className="mt-4 w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              >
+                Visualizza Dettagli
+              </button>
             </div>
           ))}
         </div>

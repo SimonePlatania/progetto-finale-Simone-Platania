@@ -6,14 +6,15 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
     nomeItem: item.nome,
     dataInizio: "",
     dataFine: "",
-    startNow: true
+    startNow: true,
   });
   const [error, setError] = useState("");
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    
+
     const now = new Date();
     const end = new Date(formData.dataFine);
     let start = formData.startNow ? now : new Date(formData.dataInizio);
@@ -30,7 +31,9 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
       }
 
       if (end < start) {
-        setError("La data di fine non può essere precedente alla data di inizio");
+        setError(
+          "La data di fine non può essere precedente alla data di inizio"
+        );
         return;
       }
 
@@ -50,7 +53,7 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
         nomeItem: formData.nomeItem,
         dataInizio: formData.startNow ? now.toISOString() : formData.dataInizio,
         dataFine: formData.dataFine,
-        startNow: formData.startNow
+        startNow: formData.startNow,
       };
 
       console.log("Dati che stiamo inviando:", dataToSubmit);
@@ -61,11 +64,9 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
       console.error("Errore completo:", err);
       console.error("Risposta del server:", err.response?.data);
       console.error("Status code:", err.response?.status);
-      
+
       setError(
-        err.response?.data || 
-        err.message || 
-        "Errore nella creazione dell'asta"
+        err.response?.data || err.message || "Errore nella creazione dell'asta"
       );
     }
   };
@@ -73,9 +74,7 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg p-6 max-w-md w-full">
-        <h3 className="text-xl font-bold mb-4">
-          Crea Asta per: {item.nome}
-        </h3>
+        <h3 className="text-xl font-bold mb-4">Crea Asta per: {item.nome}</h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="flex items-center mb-4">
@@ -83,11 +82,13 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
               type="checkbox"
               id="startNow"
               checked={formData.startNow}
-              onChange={(e) => setFormData({
-                ...formData,
-                startNow: e.target.checked,
-                dataInizio: e.target.checked ? "" : formData.dataInizio
-              })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  startNow: e.target.checked,
+                  dataInizio: e.target.checked ? "" : formData.dataInizio,
+                })
+              }
               className="mr-2"
             />
             <label htmlFor="startNow">Inizia subito</label>
@@ -96,13 +97,15 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
           {!formData.startNow && (
             <div>
               <label className="block mb-2">Data Inizio</label>
-              <input 
+              <input
                 type="datetime-local"
                 value={formData.dataInizio}
-                onChange={(e) => setFormData({
-                  ...formData,
-                  dataInizio: e.target.value
-                })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    dataInizio: e.target.value,
+                  })
+                }
                 className="w-full px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
                 min={new Date().toISOString().slice(0, 16)}
               />
@@ -114,21 +117,19 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
             <input
               type="datetime-local"
               value={formData.dataFine}
-              onChange={(e) => setFormData({
-                ...formData,
-                dataFine: e.target.value
-              })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  dataFine: e.target.value,
+                })
+              }
               className="w-full p-2 border rounded-lg bg-gray-200"
               min={new Date().toISOString().slice(0, 16)}
               required
             />
           </div>
 
-          {error && (
-            <div className="text-red-500 text-sm mb-4">
-              {error}
-            </div>
-          )}
+          {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
 
           <div className="flex justify-end gap-4 mt-6">
             <button
