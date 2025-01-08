@@ -45,6 +45,31 @@ public class NotificaService {
 		}
 	}
 
+	public void inviaNotificaNuovaAsta(Long astaId, Long receiverId, String nomeItem) {
+		if (astaId == null || receiverId == null || nomeItem == null) {
+			throw new IllegalArgumentException("I parametri non possono essere null");
+		}
+
+		Notifica notifica = new Notifica();
+		notifica.setTipo(Notifica.TIPO_NUOVA_ASTA);
+		notifica.setMessaggio("Una nuova asta è stata creata: " + nomeItem);
+		notifica.setAstaId(astaId);
+		notifica.setData(LocalDateTime.now());
+		notifica.setUserId(receiverId);
+		notifica.setTipoUtente("PARTECIPANTE");
+
+		try {
+			notificaMapper.insert(notifica);
+			messagingTemplate.convertAndSendToUser(receiverId.toString(), "/notifica/utente", notifica);
+			System.out.println("Notifica offerta inviata a: " + receiverId);
+
+		} catch (Exception e) {
+			System.out.println("Errore invio notifica nuova asta: " + e.getMessage());
+			e.printStackTrace();
+		}
+
+	}
+
 	public void inviaNotificaScadenza(Long astaId, Long userId) {
 		if (astaId == null || userId == null) {
 			throw new IllegalArgumentException("I parametri non possono essere null");
@@ -67,14 +92,14 @@ public class NotificaService {
 		}
 	}
 
-	public void inviaNotificaPartecipazione(Long astaId, Long userId, Long gestoreId, String usernamePartecipante) {
-		if (astaId == null || userId == null || gestoreId == null) {
+	public void inviaNotificaPartecipazione(Long astaId, Long receiverId, Long gestoreId, String usernamePartecipante) {
+		if (astaId == null || receiverId == null || gestoreId == null) {
 			throw new IllegalArgumentException("Parameters cannot be null");
 		}
 
 		Notifica notifica = new Notifica();
 		notifica.setTipo(Notifica.TIPO_PARTECIPAZIONE_ASTA);
-		notifica.setMessaggio("L'utente " + usernamePartecipante + " ha partecipato all'asta #" + astaId);
+		notifica.setMessaggio("L'utente " + usernamePartecipante + " ha fatto un'offerta per ID ASTA: "+astaId);
 		notifica.setAstaId(astaId);
 		notifica.setData(LocalDateTime.now());
 		notifica.setUserId(gestoreId);
@@ -141,31 +166,27 @@ public class NotificaService {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void inviaNotificaOffertaSuperata(Long astaId, Long userId, BigDecimal nuovoImporto) {
-        if (astaId == null || userId == null || nuovoImporto == null) {
-            throw new IllegalArgumentException("I parametri non possono essere null");
-        }
+		if (astaId == null || userId == null || nuovoImporto == null) {
+			throw new IllegalArgumentException("I parametri non possono essere null");
+		}
 
-        Notifica notifica = new Notifica();
-        notifica.setTipo(Notifica.TIPO_OFFERTA_SUPERATA);
-        notifica.setMessaggio("La tua offerta per l'asta #" + astaId + 
-                            " è stata superata. Nuova offerta: €" + nuovoImporto);
-        notifica.setAstaId(astaId);
-        notifica.setData(LocalDateTime.now());
-        notifica.setUserId(userId);
-        notifica.setTipoUtente("PARTECIPANTE");
+		Notifica notifica = new Notifica();
+		notifica.setTipo(Notifica.TIPO_OFFERTA_SUPERATA);
+		notifica.setMessaggio(
+				"La tua offerta per l'asta #" + astaId + " è stata superata. Nuova offerta: €" + nuovoImporto);
+		notifica.setAstaId(astaId);
+		notifica.setData(LocalDateTime.now());
+		notifica.setUserId(userId);
+		notifica.setTipoUtente("PARTECIPANTE");
 
-        try {
-            notificaMapper.insert(notifica);
-            messagingTemplate.convertAndSendToUser(
-                userId.toString(),
-                "/notifica/utente",
-                notifica
-            );
-        } catch (Exception e) {
-            System.err.println("Errore invio notifica offerta superata: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
+		try {
+			notificaMapper.insert(notifica);
+			messagingTemplate.convertAndSendToUser(userId.toString(), "/notifica/utente", notifica);
+		} catch (Exception e) {
+			System.err.println("Errore invio notifica offerta superata: " + e.getMessage());
+			e.printStackTrace();
+		}
+	}
 }

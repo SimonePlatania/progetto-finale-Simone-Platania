@@ -111,6 +111,14 @@ public class AstaService {
 		item.setInAsta(true);
 		itemMapper.update(item);
 
+		List<Utente> partecipanti = utenteMapper.findAllByRuolo("PARTECIPANTE");
+
+		for (Utente partecipante : partecipanti) {
+			notificaService.inviaNotificaNuovaAsta(asta.getId(), partecipante.getId(), asta.getNomeItem()
+
+			);
+		}
+
 		return asta;
 	}
 
@@ -197,6 +205,12 @@ public class AstaService {
 			notificaService.inviaNotificaOffertaSuperata(astaId, asta.getOffertaCorrenteId(), importoOfferta);
 		}
 
+		if (asta.getOffertaCorrente() == null) {
+			LocalDateTime nuovaDataFine = now.plusMinutes(5);
+			asta.setDataFine(nuovaDataFine);
+			astaMapper.updateDataFine(asta);
+		}
+
 		Offerta offerta = new Offerta();
 		offerta.setAstaId(astaId);
 		offerta.setItemId(asta.getItemId());
@@ -228,24 +242,23 @@ public class AstaService {
 	}
 
 	public List<OffertaDTO> getStoricoOfferte(Long astaId, Long userId) {
-	    Utente utente = utenteMapper.findById(userId);
-	    boolean isGestore = "GESTORE".equals(utente.getRuolo());
-	    
-	    System.out.println("Recupero offerte per asta: " + astaId + ", utente: " + userId + 
-	                      " (isGestore: " + isGestore + ")");
+		Utente utente = utenteMapper.findById(userId);
+		boolean isGestore = "GESTORE".equals(utente.getRuolo());
 
-	    List<Offerta> offerte = offertaMapper.findByAstaId(astaId);
-	    List<OffertaDTO> risultato = new ArrayList<>();
+		System.out.println(
+				"Recupero offerte per asta: " + astaId + ", utente: " + userId + " (isGestore: " + isGestore + ")");
 
-	    for (Offerta offerta : offerte) {
-	        OffertaDTO dto = OffertaDTO.fromOfferta(offerta, isGestore, userId);
-	        System.out.println("Offerta ID: " + offerta.getId() + 
-	                          ", UtenteId: " + offerta.getUtenteId() + 
-	                          ", isCurrentUser: " + dto.getCurrentUserOfferta());
-	        risultato.add(dto);
-	    }
+		List<Offerta> offerte = offertaMapper.findByAstaId(astaId);
+		List<OffertaDTO> risultato = new ArrayList<>();
 
-	    return risultato;
+		for (Offerta offerta : offerte) {
+			OffertaDTO dto = OffertaDTO.fromOfferta(offerta, isGestore, userId);
+			System.out.println("Offerta ID: " + offerta.getId() + ", UtenteId: " + offerta.getUtenteId()
+					+ ", isCurrentUser: " + dto.getCurrentUserOfferta());
+			risultato.add(dto);
+		}
+
+		return risultato;
 	}
 
 	// 28/12/2024 Simone SERVICE PER POTER TERMINARE UN'ASTA 4)

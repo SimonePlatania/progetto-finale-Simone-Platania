@@ -1,5 +1,6 @@
 package com.login.mapper;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -32,6 +33,9 @@ public interface UtenteMapper {
     @Select("SELECT * FROM users WHERE email = #{email}")
     @ResultMap("utenteResultMap")
     Utente findByEmail(String email);
+    
+    @Select("SELECT * FROM users WHERE role = #{ruolo}")
+    List<Utente> findAllByRuolo(String ruolo);
     
     // 24/12/2024 Simone MAPPER PER L'INSERIMENTO DI UN UTENTE 3)
     @Insert("INSERT INTO users (username, email, password, role, created_at) " +

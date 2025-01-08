@@ -55,6 +55,10 @@ public interface OffertaMapper {
 	            "WHERE o.asta_id = #{astaId} " +
 	            "ORDER BY o.data_offerta DESC LIMIT 1")
 	    Offerta findLastOffertaByAstaId(@Param("astaId") Long astaId);
+	    
+	    @Select("SELECT EXISTS(SELECT 1 FROM offerte WHERE asta_id = #{astaId})")
+	    boolean existsOffertaByAstaId(@Param("astaId") Long astaId);
+	    
 
 	    //02/01/2025 Simone  Aggiunta la possibilità di contare il numero di offerte per un'asta (utile per statistiche)
 	    @Select("SELECT COUNT(*) FROM offerte WHERE asta_id = #{astaId}")

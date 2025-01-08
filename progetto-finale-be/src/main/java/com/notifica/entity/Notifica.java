@@ -8,6 +8,9 @@ public class Notifica {
     public static final String TIPO_ASTA_VINTA = "ASTA_VINTA";
     public static final String TIPO_ASTA_TERMINATA = "ASTA_TERMINATA";
     public static final String TIPO_OFFERTA_SUPERATA = "OFFERTA_SUPERATA";
+    public static final String TIPO_NUOVA_ASTA = "NUOVA_ASTA";
+
+    
 
 
     private Long id;

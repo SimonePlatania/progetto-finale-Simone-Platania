@@ -9,6 +9,7 @@ import {
   ArrowUpCircle,
   Ban,
   Info,
+  PlusCircle,
 } from "lucide-react";
 
 const TIPI_NOTIFICA = {
@@ -17,7 +18,8 @@ const TIPI_NOTIFICA = {
   PARTECIPAZIONE_ASTA: "PARTECIPAZIONE_ASTA",
   ASTA_VINTA: "ASTA_VINTA",
   ASTA_TERMINATA: "ASTA_TERMINATA",
-  OFFERTA_SUPERATA: "OFFERTA_SUPERATA"
+  OFFERTA_SUPERATA: "OFFERTA_SUPERATA",
+  NUOVA_ASTA: "NUOVA_ASTA"
 };
 
 const NotificationBell = ({ userId }) => {
@@ -67,6 +69,12 @@ const NotificationBell = ({ userId }) => {
         icon: <ArrowUpCircle className="w-5 h-5 text-purple-500" />,
         bgColor: "bg-purple-50",
         borderColor: "border-purple-100"
+      },
+
+      [TIPI_NOTIFICA.NUOVA_ASTA]: {
+        icon: <PlusCircle className="w-5 h-5 text-green-500"/>,
+        bgColor: "bg-green-50",
+        borderColor: "border-green-100"
       },
       DEFAULT: {
         icon: <Info className="w-5 h-5 text-gray-500" />,

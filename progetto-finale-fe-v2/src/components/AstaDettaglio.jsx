@@ -204,7 +204,7 @@ function AstaDettaglio() {
         <div className="bg-white rounded-lg shadow-lg p-6">
           {/* SE L'ASTA E' AGGIUDICATA */}
           {asta.stato === "TERMINATA" && (
-            <div className="bg-green-100 border-l-4 border-green-500 p-4 mb-6">
+            <div className="bg-green-100 border-l-4 border-green-500 p-5 mb-8 text-center rounded-md shadow-inner">
               <div className="flex items-center">
                 <svg
                   className="h-6 w-6 text-green-600 mr-3"
@@ -222,8 +222,8 @@ function AstaDettaglio() {
 
               {user.ruolo === "GESTORE" && asta.usernameOfferente && (
                 <p className="mt-2 text-green-700">
-                  Aggiudicata a: {asta.usernameOfferente}
-                  per € {asta.offertaCorrente?.toFixed(2)}
+                  Aggiudicata a: {asta.usernameOfferente} 
+                    , per <p className="text-xl font-bold italic">€ {asta.offertaCorrente?.toFixed(2)}</p>
                 </p>
               )}
             </div>
@@ -324,16 +324,6 @@ function AstaDettaglio() {
               </form>
             )}
 
-          {/* <div className="border-b pb-4 mb-6">
-            <h2 className="text-2xl font-bold">{asta.nomeItem}</h2>
-            {item?.deleted && (
-              <div className="mt-2 p-2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700">
-                Questo item non è più disponibile nel sistema
-              </div>
-            )}
-            <p className="text-gray-600 mt-2">{item?.descrizione}</p>
-          </div> */}
-
           {asta.stato === "TERMINATA" && user.ruolo === "PARTECIPANTE" && (
             <div className="bg-gray-100 p-4 rounded-lg mb-6 text-center">
               <p className="text-gray-700 font-medium">
@@ -368,22 +358,21 @@ function AstaDettaglio() {
                   className="bg-gray-50 p-3 rounded-lg flex justify-between items-center"
                 >
                   <div>
-                    {console.log(
-                      "Condizione isCurrentUserOfferta:",
-                      offerta.currentUserOfferta
-                    )}
-                    {offerta.currentUserOfferta ? (
+                   
+                    {offerta.currentUserOfferta && user.ruolo === "PARTECIPANTE" && (
                       <span className="text-sky-700 font-medium flex items-center shadow-md">
                         Tu hai offerto: €{offerta.importo?.toFixed(2)}
                       </span>
-                    ) : (
+                    )}
+                    {user.ruolo === "PARTECIPANTE" && !offerta.currentUserOfferta && (
                       <span className="text-red-700 font-medium flex items-center shadow-md">
                         Qualcuno ha offerto: €{offerta.importo?.toFixed(2)}
                       </span>
                     )}
                     {user.ruolo === "GESTORE" && (
-                      <span className="ml-2 text-gray-600">
-                        da {offerta.usernameOfferente}
+                      <span className="ml-2 text-indigo-600 font-medium shadow-indigo-900">
+                      {offerta.usernameOfferente} ha offerto: 
+                      <span className="ml-2 text-gray-900 italic shadow-inner">€{offerta.importo?.toFixed(2)}</span>
                       </span>
                     )}
                   </div>

@@ -57,6 +57,9 @@ public interface AstaMapper {
 			+ "offerta_corrente_id = #{offertaCorrenteId} WHERE id = #{id}")
 	void updateOfferta(Asta asta);
 	
+	//08/01/25 Simone IMPLEMENTATO MAPPER PER GESTIRE LA FINE DI UN ASTA A 5 MINS DALL'OFFERTA
+	@Update("UPDATE aste SET data_fine = #{dataFine} WHERE id = #{id}")
+	void updateDataFine(Asta asta);
 
 	@Update("UPDATE aste SET is_attiva = #{isAttiva}, stato = #{stato} WHERE id = #{id}")
 	void update(Asta asta);
