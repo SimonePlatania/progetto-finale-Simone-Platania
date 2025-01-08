@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import NotificationBell from "./NotificationBell";
+import CountDownTimer from "./CountdownTimer";
 
 function Homepage() {
   const [user, setUser] = useState(null);
@@ -222,18 +223,31 @@ function Homepage() {
                 <div className="mt-auto">
                   <div className="text-sm text-gray-500 mb-4">
                     {asta.startNow ? (
-                      <p>
-                        Scade il: {new Date(asta.dataFine).toLocaleString()}
-                      </p>
+                      <div className="space-y-2">
+                        <p>
+                          Scade il: {new Date(asta.dataFine).toLocaleString()}
+                        </p>
+                        <p>Tempo rimanente:</p>
+                        <CountDownTimer targetDate={asta.dataFine} />
+                      </div>
                     ) : (
                       <>
-                        <p>
-                          Inizia il:{" "}
-                          {new Date(asta.dataInizio).toLocaleString()}
-                        </p>
-                        <p>
-                          Termina il: {new Date(asta.dataFine).toLocaleString()}
-                        </p>
+                        <div className="space-y-2">
+                          <p>
+                            Inizia il:{" "}
+                            {new Date(asta.dataInizio).toLocaleString()}
+                          </p>
+                          <p>Tempo all'inizio:</p>
+                          <CountDownTimer targetDate={asta.dataInizio} />
+                        </div>
+                        <div className="mt-4 space-y-2">
+                          <p>
+                            Termina il:{" "}
+                            {new Date(asta.dataFine).toLocaleString()}
+                          </p>
+                          <p>Tempo alla fine:</p>
+                          <CountDownTimer targetDate={asta.dataFine} />
+                        </div>
                       </>
                     )}
                   </div>

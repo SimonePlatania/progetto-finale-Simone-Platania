@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import CountDownTimer from "./CountdownTimer";
 
 function AstaDettaglio() {
   const { id } = useParams();
@@ -183,9 +184,9 @@ function AstaDettaglio() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 rounded-md">
       {/* HEADER */}
-      <header className="bg-white shadow">
+      <header className="bg-white shadow rounded-md">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <button
             onClick={() => navigate("/homepage")}
@@ -222,42 +223,61 @@ function AstaDettaglio() {
 
               {user.ruolo === "GESTORE" && asta.usernameOfferente && (
                 <p className="mt-2 text-green-700">
-                  Aggiudicata a: {asta.usernameOfferente} 
-                    , per <p className="text-xl font-bold italic">€ {asta.offertaCorrente?.toFixed(2)}</p>
+                  Aggiudicata a: {asta.usernameOfferente}, per{" "}
+                  <p className="text-xl font-bold italic">
+                    € {asta.offertaCorrente?.toFixed(2)}
+                  </p>
                 </p>
               )}
             </div>
           )}
 
-          {/* INTEST */}
-          <div className="border-b pb-4 mb-6">
-            <h2 className="text-2xl font-bold">{asta.nomeItem}</h2>
-            <p className="text-gray-600 mt-2">{item.descrizione}</p>
+          {/* INTESTAZIONE */}
+          <div className="border-b border-gray-200 pb-4 mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">
+              {asta.nomeItem}
+            </h2>
+            <p className="text-gray-600 mt-2 leading-relaxed">
+              {item.descrizione}
+            </p>
           </div>
 
           {/* INFO PRINCIPALI */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-gray-600 text-sm">Prezzo Base</p>
-              <p className="text-xl font-medium">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+              <p className="text-gray-600 text-sm font-medium">Prezzo Base</p>
+              <p className="text-xl font-semibold mt-1">
                 €{item.prezzoBase?.toFixed(2)}
               </p>
             </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-gray-600 text-sm">Rilancio Minimo</p>
-              <p className="text-xl font-medium">
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+              <p className="text-gray-600 text-sm font-medium">
+                Rilancio Minimo
+              </p>
+              <p className="text-xl font-semibold mt-1">
                 €{item.rilancioMinimo?.toFixed(2)}
               </p>
             </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-gray-600 text-sm">Offerta Corrente</p>
-              <p className="text-xl font-medium">
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+              <p className="text-gray-600 text-sm font-medium">
+                Offerta Corrente
+              </p>
+              <p className="text-xl font-semibold mt-1">
                 {asta.offertaCorrente
                   ? `€${asta.offertaCorrente.toFixed(2)}`
                   : "Nessuna offerta"}
               </p>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+              <p className="text-gray-600 text-sm font-medium text-center">
+                Tempo rimanente
+              </p>
+              <div className="mt-1 py-2 px-2">
+                <CountDownTimer targetDate={asta.dataFine} />
+              </div>
             </div>
           </div>
 
@@ -358,21 +378,24 @@ function AstaDettaglio() {
                   className="bg-gray-50 p-3 rounded-lg flex justify-between items-center"
                 >
                   <div>
-                   
-                    {offerta.currentUserOfferta && user.ruolo === "PARTECIPANTE" && (
-                      <span className="text-sky-700 font-medium flex items-center shadow-md">
-                        Tu hai offerto: €{offerta.importo?.toFixed(2)}
-                      </span>
-                    )}
-                    {user.ruolo === "PARTECIPANTE" && !offerta.currentUserOfferta && (
-                      <span className="text-red-700 font-medium flex items-center shadow-md">
-                        Qualcuno ha offerto: €{offerta.importo?.toFixed(2)}
-                      </span>
-                    )}
+                    {offerta.currentUserOfferta &&
+                      user.ruolo === "PARTECIPANTE" && (
+                        <span className="text-sky-700 font-medium flex items-center shadow-md">
+                          Tu hai offerto: €{offerta.importo?.toFixed(2)}
+                        </span>
+                      )}
+                    {user.ruolo === "PARTECIPANTE" &&
+                      !offerta.currentUserOfferta && (
+                        <span className="text-red-700 font-medium flex items-center shadow-md">
+                          Qualcuno ha offerto: €{offerta.importo?.toFixed(2)}
+                        </span>
+                      )}
                     {user.ruolo === "GESTORE" && (
                       <span className="ml-2 text-indigo-600 font-medium shadow-indigo-900">
-                      {offerta.usernameOfferente} ha offerto: 
-                      <span className="ml-2 text-gray-900 italic shadow-inner">€{offerta.importo?.toFixed(2)}</span>
+                        {offerta.usernameOfferente} ha offerto:
+                        <span className="ml-2 text-gray-900 italic shadow-inner">
+                          €{offerta.importo?.toFixed(2)}
+                        </span>
                       </span>
                     )}
                   </div>

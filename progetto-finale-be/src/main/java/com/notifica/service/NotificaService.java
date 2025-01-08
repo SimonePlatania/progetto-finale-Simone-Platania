@@ -2,6 +2,7 @@ package com.notifica.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -99,7 +100,7 @@ public class NotificaService {
 
 		Notifica notifica = new Notifica();
 		notifica.setTipo(Notifica.TIPO_PARTECIPAZIONE_ASTA);
-		notifica.setMessaggio("L'utente " + usernamePartecipante + " ha fatto un'offerta per ID ASTA: "+astaId);
+		notifica.setMessaggio("Nuova offerta da: " + usernamePartecipante + ", ID asta #"+astaId);
 		notifica.setAstaId(astaId);
 		notifica.setData(LocalDateTime.now());
 		notifica.setUserId(gestoreId);
@@ -114,6 +115,7 @@ public class NotificaService {
 			e.printStackTrace();
 		}
 	}
+	
 
 	public List<Notifica> getNotificheUtente(Long userId) {
 		return notificaMapper.findByUserId(userId);
@@ -121,6 +123,26 @@ public class NotificaService {
 
 	public void markAsRead(Long id) {
 		notificaMapper.markAsRead(id);
+	}
+	
+	@Transactional
+	public List<Notifica> markAllAsRead(Long userId) {
+		if (userId == null) {
+			throw new IllegalArgumentException("UserId e Id non possono essere null");
+			
+		}
+		
+		try {
+			notificaMapper.markAllAsRead(userId);
+		List<Notifica> notificheAggiornate = notificaMapper.findByUserId(userId);
+		
+		return notificheAggiornate != null ? notificheAggiornate : new ArrayList<>();
+		
+		} catch (Exception e) {
+			
+			throw new RuntimeException("Errore durante l'aggiornamento delle modifiche");
+		}
+
 	}
 
 	public void inviaNotificaVincitore(Long astaId, Long userId, BigDecimal importo) {

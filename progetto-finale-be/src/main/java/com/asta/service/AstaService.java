@@ -40,19 +40,25 @@ public class AstaService {
 	}
 
 	public List<Asta> getAsteAttive() {
-		List<Asta> asteAttive = astaMapper.findAsteAttive();
+	    LocalDateTime now = LocalDateTime.now();
+	    List<Asta> asteAttive = astaMapper.findAsteAttive();
 
-		for (Asta asta : asteAttive) {
+	    for (Asta asta : asteAttive) {
+	    	
+	        if (!asta.isStartNow() && asta.getDataInizio().isBefore(now)) {
+	            asta.setStartNow(true);
+	            astaMapper.updateStartNow(asta); 
+	        }
 
-			if (asta.getOffertaCorrenteId() != null) {
-				Utente offerente = utenteMapper.findById(asta.getOffertaCorrenteId());
-				if (offerente != null) {
-					asta.setUsernameOfferente(offerente.getUsername());
-				}
-			}
-		}
+	        if (asta.getOffertaCorrenteId() != null) {
+	            Utente offerente = utenteMapper.findById(asta.getOffertaCorrenteId());
+	            if (offerente != null) {
+	                asta.setUsernameOfferente(offerente.getUsername());
+	            }
+	        }
+	    }
 
-		return asteAttive;
+	    return asteAttive;
 	}
 
 	public Asta findById(Long id) {
@@ -260,6 +266,8 @@ public class AstaService {
 
 		return risultato;
 	}
+	
+	
 
 	// 28/12/2024 Simone SERVICE PER POTER TERMINARE UN'ASTA 4)
 	@Transactional
@@ -276,14 +284,19 @@ public class AstaService {
 				throw new RuntimeException("Non sei autorizzato a terminare questa asta");
 			}
 		}
+		
+		if (asta.getOffertaCorrenteId() != null) {
+	        Utente vincitore = utenteMapper.findById(asta.getOffertaCorrenteId());
+	        if (vincitore != null) {
+	            asta.setUsernameOfferente(vincitore.getUsername());
+				notificaService.inviaNotificaVincitore(astaId, asta.getOffertaCorrenteId(), asta.getOffertaCorrente());
+
+	        }
+	    }
 
 		asta.setIsAttiva(false);
 		asta.setStato("TERMINATA");
 		astaMapper.update(asta);
-
-		if (asta.getOffertaCorrenteId() != null) {
-			notificaService.inviaNotificaVincitore(astaId, asta.getOffertaCorrenteId(), asta.getOffertaCorrente());
-		}
 
 		// 07/01 Simone Qui avevo la necessità di notificare tutti i partecipanti della
 		// chiusura dell'asta

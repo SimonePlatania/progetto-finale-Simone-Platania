@@ -35,8 +35,10 @@ public interface AstaMapper {
 			+ "LEFT JOIN items i ON a.item_id = i.id " 
 			+ "LEFT JOIN users u ON a.offerta_corrente_id = u.id")
 	List<Asta> findAll();
-
 	
+	 @Update("UPDATE aste SET is_start_now = #{isStartNow} WHERE id = #{id}")
+	 void updateStartNow(Asta asta);
+
 	@Insert("INSERT INTO aste (item_id, data_inizio, data_fine, stato, is_attiva, is_start_now, nome_item) "
 			+ "VALUES (#{itemId}, #{dataInizio}, #{dataFine}, #{stato}, #{isAttiva}, #{isStartNow}, #{nomeItem})")
 	@Options(useGeneratedKeys = true, keyProperty = "id")

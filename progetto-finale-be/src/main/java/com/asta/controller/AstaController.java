@@ -46,7 +46,15 @@ public class AstaController {
 	// 1)
 	@GetMapping("/attive")
 	public ResponseEntity<List<Asta>> getAsteAttive() {
-		return ResponseEntity.ok(astaService.getAsteAttive());
+	    try {
+	        List<Asta> aste = astaService.getAsteAttive();
+	        return ResponseEntity.ok(aste);
+	    } catch (Exception e) {
+	        // Logga l'errore per debugging
+	        System.err.println("Errore nel recupero delle aste attive: " + e.getMessage());
+	        e.printStackTrace();
+	        return ResponseEntity.badRequest().build();
+	    }
 	}
 
 	// 29/12/2024 Simone

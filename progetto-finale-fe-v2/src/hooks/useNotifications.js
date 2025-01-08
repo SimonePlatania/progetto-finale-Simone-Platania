@@ -69,6 +69,8 @@ export const useNotifications = (userId) => {
     };
   }, [userId]);
 
+
+
   const markAsRead = async (notificationId) => {
     try {
       await fetch(
@@ -89,9 +91,40 @@ export const useNotifications = (userId) => {
     }
   };
 
+  const markAllAsRead = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/notifiche/utente/${userId}/clear`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            Authorization: localStorage.getItem("sessionId"),
+            'Content-Type': 'application/json'
+          },
+        }
+      );
+  
+      if (!response.ok) {
+        // Cerchiamo di ottenere il messaggio di errore dal server
+        const errorText = await response.text();
+        console.error('Risposta server:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      }
+  
+      const updatedNotifications = await response.json();
+      setNotifications(updatedNotifications);
+    } catch (error) {
+      console.error("Errore durante la pulizia delle notifiche:", error);
+      throw error;
+    }
+  };
+
+
   return {
     notifications,
     isConnected,
     markAsRead,
+    markAllAsRead,
   };
 };
