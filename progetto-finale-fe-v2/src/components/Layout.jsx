@@ -4,7 +4,7 @@ import NotificationBell from "./NotificationBell";
 
 const Layout = () => {
   const location = useLocation();
-  const currentUser = JSON.parse(localStorage.getItem("currentUser")); // o sessionStorage
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
 
   // Pagine dove non mostrare il NotificationBell
   const excludedPaths = ["/login", "/registra", "/registra-gestore"];

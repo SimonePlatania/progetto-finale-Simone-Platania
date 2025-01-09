@@ -156,6 +156,9 @@ function Homepage() {
           </div>
         </div>
       </header>
+
+
+      
       {/* Contenuto Principale */}
       <main className="max-w-[90%] mx-auto px-8 py-8">
         {error ? (

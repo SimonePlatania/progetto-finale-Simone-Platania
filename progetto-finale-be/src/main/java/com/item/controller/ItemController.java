@@ -1,7 +1,13 @@
 package com.item.controller;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.item.entity.Item;
 import com.item.mapper.ItemMapper;
@@ -37,12 +44,13 @@ public class ItemController {
 
 	@PostMapping
 	public ResponseEntity<?> createItem(@RequestBody Item item, @RequestParam Long gestoreId) {
+		logger.info("Ricevuta richiesta di creazione item per gestore ID: {}", gestoreId);
 		try {
-			logger.info("Ricevuta richiesta di creazione item per gestore ID: {}", gestoreId);
 			itemService.createItem(item, gestoreId);
 			return ResponseEntity.ok(item);
 		} catch (Exception e) {
 			logger.error("Errore durante la creazione dell'item", e);
+	        logger.info("Ricevuto item con imageUrl: {}", item.getImageUrl());
 			return ResponseEntity.badRequest().body("Errore: " + e.getMessage());
 		}
 	}
@@ -147,6 +155,37 @@ public class ItemController {
 				
 			} catch (Exception e) {
 				return ResponseEntity.badRequest().body("Errore durante l'aggiornamento dell'oggetto");
+			}
+		}
+		
+		//AGGIUNTO METODO PER IMPLEMENTARE UPLOAD
+		
+		@PostMapping("/uploads")
+		public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+			   logger.info("Inizio upload file: {}", file.getOriginalFilename());
+			   logger.info("Dimensione file: {} bytes", file.getSize());
+			
+			try {
+				String uploadDir = "src/main/resources/static/uploads/";
+				Path uploadPath = Paths.get(uploadDir);
+				
+		        logger.info("Verifico directory: {}", uploadDir);
+				if (!Files.exists(uploadPath)) {
+					Files.createDirectories(uploadPath);
+				}
+				
+				String fileName = UUID.randomUUID() + "_" +file.getOriginalFilename();
+				Path filePath = uploadPath.resolve(fileName);
+				
+		        logger.info("Salvo file come: {}", fileName);
+				Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+				
+		        logger.info("File salvato con successo. URL: {}", fileName);
+				return ResponseEntity.ok("/uploads/" + fileName);
+
+			} catch (IOException e) {
+		        logger.error("Errore durante l'upload:", e);
+				return ResponseEntity.badRequest().body("Errore upload: " + e.getMessage());
 			}
 		}
 

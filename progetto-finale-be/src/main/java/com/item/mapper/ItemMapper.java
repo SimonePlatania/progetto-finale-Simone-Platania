@@ -28,7 +28,9 @@ public interface ItemMapper {
 		        @Result(property = "dataCreazione", column = "data_creazione"),
 		        @Result(property = "inAsta", column = "in_asta"),
 		        @Result(property = "gestoreId", column = "gestore_id"),
-		        @Result(property = "gestoreUsername", column = "gestore_username")
+		        @Result(property = "gestoreUsername", column = "gestore_username"),
+		        @Result(property = "imageUrl", column = "image_url"),
+
 		    })
 		    @Select("SELECT i.*, u.username as gestore_username " +
 		            "FROM items i " +
@@ -48,7 +50,8 @@ public interface ItemMapper {
 	        @Result(property = "inAsta", column = "in_asta"),
 	        @Result(property = "gestoreId", column = "gestore_id"),
 	        @Result(property = "deleted", column = "deleted"),
-	        @Result(property = "gestoreUsername", column = "gestore_username",
+	        @Result(property = "gestoreUsername", column = "gestore_username"),
+			@Result(property = "imageUrl", column = "image_url",
 	                one = @One(select = "com.login.mapper.UtenteMapper.findUsernameById"))
 	    })
 	    Item findById(@Param("id") Long id);
@@ -64,26 +67,28 @@ public interface ItemMapper {
 	        @Result(property = "inAsta", column = "in_asta"),
 	        @Result(property = "gestoreId", column = "gestore_id"),
 	        @Result(property = "deleted", column = "deleted"),
-	        @Result(property = "gestoreUsername", column = "gestore_username",
+	        @Result(property = "gestoreUsername", column = "gestore_username"),
+	        @Result(property = "imageUrl", column = "image_url",
 	                one = @One(select = "com.login.mapper.UtenteMapper.findUsernameById"))
 	    })
 	    Item findByIdActive(@Param("id") Long id);
 	
 	 
 	// 27/12/2024 Simone MAPPER INSERIMENTO OGGETTO NEL DATABASE 3)
-	 @Insert("INSERT INTO items (nome, descrizione, prezzo_base, rilancio_minimo, " +
-	            "data_creazione, in_asta, gestore_id, deleted) VALUES " +
+	    @Insert("INSERT INTO items (nome, descrizione, prezzo_base, rilancio_minimo, " +
+	            "data_creazione, in_asta, gestore_id, deleted, image_url) VALUES " +
 	            "(#{nome}, #{descrizione}, #{prezzoBase}, #{rilancioMinimo}, " +
-	            "#{dataCreazione}, #{inAsta}, #{gestoreId}, false)")
+	            "#{dataCreazione}, #{inAsta}, #{gestoreId}, false, #{imageUrl})")
 	    @Options(useGeneratedKeys = true, keyProperty = "id")
 	    void insert(Item item);
 
 
 	// 27/12/2024 Simone MAPPER AGGIORNAMENTO OGGETTO NEL DATABASE 4)
-	@Update("UPDATE items SET nome = #{nome}, descrizione = #{descrizione}, "
-			+ "prezzo_base = #{prezzoBase}, rilancio_minimo = #{rilancioMinimo}, "
-			+ "in_asta = #{inAsta}, deleted = #{deleted} WHERE id = #{id}")
-	void update(Item item);
+	    @Update("UPDATE items SET nome = #{nome}, descrizione = #{descrizione}, "
+	            + "prezzo_base = #{prezzoBase}, rilancio_minimo = #{rilancioMinimo}, "
+	            + "in_asta = #{inAsta}, deleted = #{deleted}, image_url = #{imageUrl} "
+	            + "WHERE id = #{id}")
+	    void update(Item item);
 
 	// 27/12/2024 Simone RIMOZIONE OGGETTO TRAMITE IL SUO ID 5)
     @Update("UPDATE items SET deleted = true WHERE id = #{id}")

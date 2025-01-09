@@ -120,6 +120,8 @@ CREATE TABLE items (
     data_creazione TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     in_asta BOOLEAN DEFAULT FALSE,
     gestore_id BIGINT,
+ALTER TABLE items
+ADD COLUMN image_url varchar(255);
 	deleted tinyint,
     FOREIGN KEY (gestore_id) REFERENCES users(id)
 );

@@ -15,7 +15,8 @@ function GestoreItems() {
     nome: "",
     descrizione: "",
     prezzoBase: "",
-    rilancioMinimo: ""
+    rilancioMinimo: "",
+    imageUrl: ""
   });
   const [error, setError] = useState("");
 
@@ -30,7 +31,6 @@ function GestoreItems() {
 
     const fetchData = async () => {
       try {
-        // Verifica utente
         const userResponse = await axios.get("http://localhost:8080/api/utenti/me", {
           headers: { Authorization: sessionId }
         });
@@ -102,7 +102,8 @@ function GestoreItems() {
           dataInizio: formData.startNow ? null : formData.dataInizio,
           dataFine: formData.dataFine,
           startNow: formData.startNow,
-          isAttiva: true  // Aggiungiamo questo campo
+          isAttiva: true,
+          imageUrl: formData.imageUrl
         },
         {
           params: { gestoreId: user.id },
@@ -177,6 +178,45 @@ function GestoreItems() {
                 className="p-2 border rounded-lg bg-gray-200"
                 required
               />
+            </div>
+
+            <div className="mb-4">
+                <label className="block mb-2">
+                  Immagine dell'oggetto
+                </label>
+                  <input
+                      type="file"
+                      onChange={async (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          const formData = new FormData();
+                          formData.append("file", file);
+
+                          try {
+                            const response = await axios.post(
+                                "http://localhost:8080/api/items/uploads",
+                                formData,
+                                {
+                                  headers: {
+                                    Authorization: localStorage.getItem("sessionId"),
+                                    'Content-Type': 'multipart/form-data'
+                                  }
+                                }
+                            );
+
+                            setNuovoItem(prev => ({
+                              ...prev,
+                                imageUrl: response.data
+                            }));
+                          } catch (err) {
+                            setError("Errore nel caricamento dell'immagine");
+                          }
+                        }
+                    }}
+                     
+                      className="w-full p-2 border rounded-lg bg-gray-200"
+                      accept="image/*"
+                    />
             </div>
             <button
               type="submit"

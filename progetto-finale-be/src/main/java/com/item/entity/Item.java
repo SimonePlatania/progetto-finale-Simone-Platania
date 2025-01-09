@@ -14,6 +14,7 @@ public class Item {
     private Long gestoreId;
     private String gestoreUsername;
     private Boolean deleted = false;
+    private String imageUrl;
     
     public Item() {}
     
@@ -28,9 +29,15 @@ public class Item {
     this.nome = nome; 
     }
     
-    
-    
-    public Boolean getDeleted() {
+    public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public Boolean getDeleted() {
 		return deleted;
 	}
 

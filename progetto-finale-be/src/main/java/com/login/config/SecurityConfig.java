@@ -65,7 +65,9 @@ public class SecurityConfig {
                     "/api/aste/{astaId}/offerte"
                 ).permitAll();
                 auth.requestMatchers(
-                    "/api/items/**"
+                    "/api/items/**",
+                     "/api/items/uploads"
+
                 ).authenticated();
                 auth.anyRequest().authenticated();
             })
