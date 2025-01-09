@@ -112,6 +112,7 @@ public class AstaService {
 		asta.setIsAttiva(true);
 		asta.setNomeItem(item.getNome());
 		asta.setStartNow(request.isStartNow());
+		
 
 		astaMapper.insert(asta);
 		item.setInAsta(true);

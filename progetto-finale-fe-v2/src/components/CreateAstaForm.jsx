@@ -7,66 +7,104 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
     dataInizio: "",
     dataFine: "",
     startNow: true,
+    imageUrl: item.imageUrl
   });
   const [error, setError] = useState("");
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setError("");
+
+  //   const now = new Date();
+  //   const end = new Date(formData.dataFine);
+  //   let start = formData.startNow ? now : new Date(formData.dataInizio);
+
+  //   try {
+  //     if (!formData.startNow && !formData.dataInizio) {
+  //       setError("Data di inizio obbligatoria se l'asta non parte subito");
+  //       return;
+  //     }
+
+  //     if (!formData.dataFine) {
+  //       setError("Data di fine obbligatoria");
+  //       return;
+  //     }
+
+  //     if (end < start) {
+  //       setError(
+  //         "La data di fine non può essere precedente alla data di inizio"
+  //       );
+  //       return;
+  //     }
+
+  //     if (!formData.startNow && start < now) {
+  //       setError("La data di inizio deve essere futura");
+  //       return;
+  //     }
+
+  //     const durationMinutes = Math.floor((end - start) / (1000 * 60));
+  //     if (durationMinutes < 5) {
+  //       setError("L'asta deve durare almeno 5 minuti");
+  //       return;
+  //     }
+
+  //     const dataToSubmit = {
+  //       itemId: formData.itemId,
+  //       nomeItem: formData.nomeItem,
+  //       dataInizio: formData.startNow ? now.toISOString() : formData.dataInizio,
+  //       dataFine: end.toISOString(), // modificato adesso
+  //       startNow: formData.startNow,
+  //       imageUrl: item.imageUrl
+  //     };
+
+  //     console.log("Dati che stiamo inviando:", dataToSubmit);
+  //     await onSubmit(dataToSubmit);
+  //     onClose();
+  //   } catch (err) {
+  //     console.error("Errore completo:", err);
+  //     console.error("Risposta del server:", err.response?.data);
+  //     console.error("Status code:", err.response?.status);
+
+  //     setError(
+  //       err.response?.data || err.message || "Errore nella creazione dell'asta"
+  //     );
+  //   }
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
-    const now = new Date();
-    const end = new Date(formData.dataFine);
-    let start = formData.startNow ? now : new Date(formData.dataInizio);
-
+  
     try {
+      const now = new Date();
+      const end = new Date(formData.dataFine);
+      
+      // Validazioni
       if (!formData.startNow && !formData.dataInizio) {
         setError("Data di inizio obbligatoria se l'asta non parte subito");
         return;
       }
-
+  
       if (!formData.dataFine) {
         setError("Data di fine obbligatoria");
         return;
       }
-
-      if (end < start) {
-        setError(
-          "La data di fine non può essere precedente alla data di inizio"
-        );
-        return;
-      }
-
-      if (!formData.startNow && start < now) {
-        setError("La data di inizio deve essere futura");
-        return;
-      }
-
-      const durationMinutes = Math.floor((end - start) / (1000 * 60));
-      if (durationMinutes < 5) {
-        setError("L'asta deve durare almeno 5 minuti");
-        return;
-      }
-
+  
+      // Formatta i dati prima dell'invio
       const dataToSubmit = {
         itemId: formData.itemId,
-        nomeItem: formData.nomeItem,
-        dataInizio: formData.startNow ? now.toISOString() : formData.dataInizio,
-        dataFine: formData.dataFine,
         startNow: formData.startNow,
+        dataInizio: formData.startNow ? null : formData.dataInizio,
+        dataFine: formData.dataFine
       };
-
-      console.log("Dati che stiamo inviando:", dataToSubmit);
-
+  
+      console.log("Dati form prima dell'invio:", dataToSubmit);
+  
       await onSubmit(dataToSubmit);
       onClose();
     } catch (err) {
-      console.error("Errore completo:", err);
-      console.error("Risposta del server:", err.response?.data);
-      console.error("Status code:", err.response?.status);
-
-      setError(
-        err.response?.data || err.message || "Errore nella creazione dell'asta"
-      );
+      console.error("Errore form:", err);
+      setError(err.response?.data || "Errore nella creazione dell'asta");
     }
   };
 
@@ -126,6 +164,7 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
               className="w-full p-2 border rounded-lg bg-gray-200"
               min={new Date().toISOString().slice(0, 16)}
               required
+              step="1"
             />
           </div>
 

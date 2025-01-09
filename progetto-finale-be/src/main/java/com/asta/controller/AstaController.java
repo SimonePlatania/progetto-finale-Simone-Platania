@@ -33,12 +33,21 @@ public class AstaController {
 
 	@PostMapping
 	public ResponseEntity<?> createAsta(@Valid @RequestBody CreaAstaRequest request, @RequestParam Long gestoreId) {
-		try {
-			Asta asta = astaService.createAsta(request, gestoreId);
-			return ResponseEntity.ok(asta);
-		} catch (Exception e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
+	    try {
+	        System.out.println("Ricevuta richiesta createAsta con dati:");
+	        System.out.println("itemId: " + request.getItemId());
+	        System.out.println("startNow: " + request.isStartNow());
+	        System.out.println("dataInizio: " + request.getDataInizio());
+	        System.out.println("dataFine: " + request.getDataFine());
+	        System.out.println("gestoreId: " + gestoreId);
+
+	        Asta asta = astaService.createAsta(request, gestoreId);
+	        return ResponseEntity.ok(asta);
+	    } catch (Exception e) {
+	        System.out.println("Errore in createAsta: " + e.getMessage());
+	        e.printStackTrace();
+	        return ResponseEntity.badRequest().body(e.getMessage());
+	    }
 	}
 
 	// 29/12/2024 Simone

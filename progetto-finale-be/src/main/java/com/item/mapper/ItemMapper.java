@@ -29,7 +29,7 @@ public interface ItemMapper {
 		        @Result(property = "inAsta", column = "in_asta"),
 		        @Result(property = "gestoreId", column = "gestore_id"),
 		        @Result(property = "gestoreUsername", column = "gestore_username"),
-		        @Result(property = "imageUrl", column = "image_url"),
+		        @Result(property = "imageUrl", column = "image_url", javaType = String.class),
 
 		    })
 		    @Select("SELECT i.*, u.username as gestore_username " +
@@ -39,39 +39,37 @@ public interface ItemMapper {
 		    List<Item> findAll();
 
 	// 27/12/2024 Simone MAPPER RICERCA ID TRAMITE PARAMETRO ID 2)
-	  @Select("SELECT * FROM items WHERE id = #{id}")
-	    @Results({
-	        @Result(property = "id", column = "id"),
-	        @Result(property = "nome", column = "nome"),
-	        @Result(property = "descrizione", column = "descrizione"),
-	        @Result(property = "prezzoBase", column = "prezzo_base"),
-	        @Result(property = "rilancioMinimo", column = "rilancio_minimo"),
-	        @Result(property = "dataCreazione", column = "data_creazione"),
-	        @Result(property = "inAsta", column = "in_asta"),
-	        @Result(property = "gestoreId", column = "gestore_id"),
-	        @Result(property = "deleted", column = "deleted"),
-	        @Result(property = "gestoreUsername", column = "gestore_username"),
-			@Result(property = "imageUrl", column = "image_url",
-	                one = @One(select = "com.login.mapper.UtenteMapper.findUsernameById"))
-	    })
-	    Item findById(@Param("id") Long id);
+	 @Select("SELECT * FROM items WHERE id = #{id}")
+	 @Results({
+	     @Result(property = "id", column = "id"),
+	     @Result(property = "nome", column = "nome"),
+	     @Result(property = "descrizione", column = "descrizione"),
+	     @Result(property = "prezzoBase", column = "prezzo_base"),
+	     @Result(property = "rilancioMinimo", column = "rilancio_minimo"),
+	     @Result(property = "dataCreazione", column = "data_creazione"),
+	     @Result(property = "inAsta", column = "in_asta"),
+	     @Result(property = "gestoreId", column = "gestore_id"),
+	     @Result(property = "deleted", column = "deleted"),
+	     @Result(property = "gestoreUsername", column = "gestore_username"),
+	     @Result(property = "imageUrl", column = "image_url", javaType = String.class)  
+	 })
+	 Item findById(@Param("id") Long id);
 
-	    @Select("SELECT * FROM items WHERE id = #{id} AND deleted = false")
-	    @Results({
-	        @Result(property = "id", column = "id"),
-	        @Result(property = "nome", column = "nome"),
-	        @Result(property = "descrizione", column = "descrizione"),
-	        @Result(property = "prezzoBase", column = "prezzo_base"),
-	        @Result(property = "rilancioMinimo", column = "rilancio_minimo"),
-	        @Result(property = "dataCreazione", column = "data_creazione"),
-	        @Result(property = "inAsta", column = "in_asta"),
-	        @Result(property = "gestoreId", column = "gestore_id"),
-	        @Result(property = "deleted", column = "deleted"),
-	        @Result(property = "gestoreUsername", column = "gestore_username"),
-	        @Result(property = "imageUrl", column = "image_url",
-	                one = @One(select = "com.login.mapper.UtenteMapper.findUsernameById"))
-	    })
-	    Item findByIdActive(@Param("id") Long id);
+	 @Select("SELECT * FROM items WHERE id = #{id} AND deleted = false")
+	 @Results({
+	     @Result(property = "id", column = "id"),
+	     @Result(property = "nome", column = "nome"),
+	     @Result(property = "descrizione", column = "descrizione"),
+	     @Result(property = "prezzoBase", column = "prezzo_base"),
+	     @Result(property = "rilancioMinimo", column = "rilancio_minimo"),
+	     @Result(property = "dataCreazione", column = "data_creazione"),
+	     @Result(property = "inAsta", column = "in_asta"),
+	     @Result(property = "gestoreId", column = "gestore_id"),
+	     @Result(property = "deleted", column = "deleted"),
+	     @Result(property = "gestoreUsername", column = "gestore_username"),
+	     @Result(property = "imageUrl", column = "image_url", javaType = String.class)
+	 })
+	 Item findByIdActive(@Param("id") Long id);
 	
 	 
 	// 27/12/2024 Simone MAPPER INSERIMENTO OGGETTO NEL DATABASE 3)

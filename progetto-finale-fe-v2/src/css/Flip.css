@@ -1,0 +1,94 @@
+/* Container principale */
+.flip-card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+    padding: 1rem;
+    width: 100%;
+  }
+  
+  .flip-card {
+    width: 350px;
+    height: 480px;
+    perspective: 1000px;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+  }
+  
+  /* Effetto hover sottile sulla card */
+  .flip-card:hover {
+    transform: translateY(-5px);
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.1));
+  }
+  
+  .flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+  }
+  
+  .flip-card.flipped .flip-card-inner {
+    transform: rotateY(180deg);
+  }
+  
+  .flip-card-front,
+  .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding: 1rem;
+  }
+  
+  .flip-card-front {
+    background: #fff;
+  }
+  
+  .flip-card-back {
+    background: #f8f9fa;
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Contenitore immagine con overflow nascosto */
+  .flip-card .flex-grow {
+    overflow: hidden;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+  
+  /* Effetto zoom immagine al hover - ridotto a 1.2 */
+  .flip-card:hover img {
+    transform: scale(1.2);
+    transition: transform 0.5s ease;
+  }
+  
+  /* Stile base immagine */
+  .flip-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: contain;
+    padding: 0.5rem;
+    background: #fff;
+    border-radius: 10px;
+    transition: transform 0.5s ease;
+  }
+  
+  /* Responsività */
+  @media (max-width: 768px) {
+    .flip-card-container {
+      gap: 1rem;
+    }
+    
+    .flip-card {
+      width: 100%;
+      max-width: 350px;
+    }
+  }

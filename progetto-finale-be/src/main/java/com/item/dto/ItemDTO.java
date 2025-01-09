@@ -7,7 +7,16 @@ public class ItemDTO {
     private String descrizione;
     private BigDecimal prezzoBase;
     private BigDecimal rilancioMinimo;
+    private String imageUrl;
     
+    
+    
+	public String getImageUrl() {
+		return imageUrl;
+	}
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
 	public String getNome() {
 		return nome;
 	}

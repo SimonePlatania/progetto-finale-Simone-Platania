@@ -94,32 +94,48 @@ function GestoreItems() {
   
   const handleCreaAsta = async (formData) => {
     try {
-      await axios.post(
+      console.log("Dati originali:", formData); // Debug originale
+  
+      // Creazione e formattazione corretta delle date
+      const now = new Date();
+      const dataFine = new Date(formData.dataFine);
+      const dataInizio = formData.startNow ? now : new Date(formData.dataInizio);
+  
+      const requestData = {
+        itemId: formData.itemId,
+        startNow: formData.startNow,
+        dataInizio: formData.startNow ? null : dataInizio.toISOString(),
+        dataFine: dataFine.toISOString()
+      };
+  
+      console.log("Dati formattati da inviare:", requestData); // Debug dati formattati
+  
+      const response = await axios.post(
         "http://localhost:8080/api/aste",
-        {
-          itemId: formData.itemId,
-          nomeItem: formData.nomeItem,
-          dataInizio: formData.startNow ? null : formData.dataInizio,
-          dataFine: formData.dataFine,
-          startNow: formData.startNow,
-          isAttiva: true,
-          imageUrl: formData.imageUrl
-        },
+        requestData,
         {
           params: { gestoreId: user.id },
-          headers: { Authorization: localStorage.getItem("sessionId") }
+          headers: { 
+            Authorization: localStorage.getItem("sessionId"),
+            'Content-Type': 'application/json'
+          }
         }
       );
   
-      // Ricarica items
-      const response = await axios.get(
+      console.log("Risposta dal server:", response.data);
+  
+      const itemsResponse = await axios.get(
         `http://localhost:8080/api/items/gestore/${user.id}`,
         { headers: { Authorization: localStorage.getItem("sessionId") } }
       );
-      setItems(response.data);
+      setItems(itemsResponse.data);
       setShowAstaForm(false);
       setSelectedItem(null);
     } catch (err) {
+      // Log più dettagliato dell'errore
+      console.error("Errore completo:", err);
+      console.error("Dettagli risposta:", err.response?.data);
+      console.error("Status code:", err.response?.status);
       setError(err.response?.data || "Errore nella creazione dell'asta");
     }
   };

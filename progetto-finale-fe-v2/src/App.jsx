@@ -29,6 +29,10 @@ const router = createBrowserRouter([
     element: <RegistraGestore />
   },
   {
+    path: "/modifica-profilo",
+    element: <ModificaProfilo/>
+  },
+  {
     element: <Layout />,
     children: [
       {
@@ -50,10 +54,6 @@ const router = createBrowserRouter([
       {
         path: "/items",
         element: <GestoreItems/>
-      },
-      {
-        path: "/modifica-profilo",
-        element: <ModificaProfilo/>
       }
     ]
   }

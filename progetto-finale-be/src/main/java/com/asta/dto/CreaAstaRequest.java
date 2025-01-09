@@ -17,7 +17,19 @@ public class CreaAstaRequest {
 	    
 	    private Boolean startNow = false;
 	    
+	    private String imageUrl;
+	    
+	    
+	    
 	    	
+
+		public String getImageUrl() {
+			return imageUrl;
+		}
+
+		public void setImageUrl(String imageUrl) {
+			this.imageUrl = imageUrl;
+		}
 
 		public Boolean isStartNow() {
 			return startNow;
