@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import CountDownTimer from "./CountdownTimer";
+import 'bootstrap/dist/css/bootstrap.css'
+
 
 function AstaDettaglio() {
   const { id } = useParams();
@@ -80,8 +82,9 @@ function AstaDettaglio() {
 
   if (isLoading || !user || !asta || !item) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-xl text-gray-600">Caricamento in corso...</div>
+
+      <div className="spinner-border" role="status">
+        <span className="sr-only">Caricamento...</span>
       </div>
     );
   }
@@ -188,12 +191,16 @@ function AstaDettaglio() {
       {/* HEADER */}
       <header className="bg-white shadow rounded-md">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <button
+          {/* <button
             onClick={() => navigate("/homepage")}
             className="text-blue-600 hover:text-blue-800"
           >
             ← Torna alla lista
-          </button>
+          </button> */}
+          <a className="text-blue-600 hover:text-blue-800"
+            onClick={() => navigate("/homepage")}>
+            ← Torna alla lista
+          </a>
           <div className="flex items-center gap-2">
             <span>Benvenuto, {user.username}</span>
           </div>
@@ -287,9 +294,8 @@ function AstaDettaglio() {
               <p className="text-gray-600">
                 Stato:{" "}
                 <span
-                  className={`font-medium ${
-                    asta.isAttiva ? "text-green-600" : "text-red-600"
-                  }`}
+                  className={`font-medium ${asta.isAttiva ? "text-green-600" : "text-red-600"
+                    }`}
                 >
                   {asta.stato || (asta.isAttiva ? "ATTIVA" : "TERMINATA")}
                 </span>
@@ -360,8 +366,8 @@ function AstaDettaglio() {
                 <p className="text-gray-600 mt-2">
                   {asta.offertaCorrente
                     ? `L'asta è stata aggiudicata per €${asta.offertaCorrente.toFixed(
-                        2
-                      )}`
+                      2
+                    )}`
                     : "L'asta è terminata senza offerte"}
                 </p>
               )}

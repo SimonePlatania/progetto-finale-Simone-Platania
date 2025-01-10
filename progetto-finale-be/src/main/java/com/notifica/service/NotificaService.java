@@ -27,6 +27,8 @@ public class NotificaService {
 		if (astaId == null || receiverId == null || importo == null) {
 			throw new IllegalArgumentException("Parameters cannot be null");
 		}
+		
+		//FINITO
 
 		Notifica notifica = new Notifica();
 		notifica.setTipo(Notifica.TIPO_NUOVA_OFFERTA);

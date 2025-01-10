@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import 'bootstrap/dist/css/bootstrap.css'
+
 
 function AsteVinte() {
   const [user, setUser] = useState(null);
@@ -51,19 +53,25 @@ function AsteVinte() {
     fetchData();
   }, [navigate]);
 
-  if (loading) return <div>Caricamento...</div>;
+  if (loading) return <div className="spinner-border" role="status">
+    <span className="sr-only">Caricamento...</span>
+  </div>
 
   return (
     <div className="min-h-screen bg-gray-100 rounded-md">
       <header className="bg-white shadow rounded-md">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <button
+          {/* <button
             onClick={() => navigate("/homepage")}
             className="text-blue-600 hover:text-blue-800"
           >
             ← Torna alla homepage
-          </button>
-          <span>Benvenuto, {user?.username}</span>
+          </button> */}
+          <a className="text-blue-600 hover:text-blue-800"
+            onClick={() => navigate("/homepage")}>
+            ← Torna alla lista
+          </a>
+          <span className="italic">Aste vinte | {user?.username}</span>
         </div>
       </header>
 
@@ -98,9 +106,8 @@ function AsteVinte() {
                     Data Fine: {new Date(asta.dataFine).toLocaleString()}
                   </p>
                   <p
-                    className={`font-semibold ${
-                      asta.isAttiva ? "text-green-600" : "text-red-600"
-                    }`}
+                    className={`font-semibold ${asta.isAttiva ? "text-green-600" : "text-red-600"
+                      }`}
                   >
                     {asta.isAttiva ? "In Corso" : "Terminata"}
                   </p>

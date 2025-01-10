@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import 'bootstrap/dist/css/bootstrap.css'
+
 
 const CountDownTimer = ({ targetDate }) => {
     const [tempoRimanente, setTempoRimanente] = useState({

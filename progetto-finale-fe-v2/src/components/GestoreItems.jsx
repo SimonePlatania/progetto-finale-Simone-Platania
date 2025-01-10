@@ -2,7 +2,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import CreateAstaForm from "./CreateAstaForm";  // Aggiungi questa riga!
+import CreateAstaForm from "./CreateAstaForm";
+import 'bootstrap/dist/css/bootstrap.css'
+
 
 
 function GestoreItems() {
@@ -91,39 +93,39 @@ function GestoreItems() {
     setSelectedItem(item);
     setShowAstaForm(true);
   };
-  
+
   const handleCreaAsta = async (formData) => {
     try {
       console.log("Dati originali:", formData); // Debug originale
-  
+
       // Creazione e formattazione corretta delle date
       const now = new Date();
       const dataFine = new Date(formData.dataFine);
       const dataInizio = formData.startNow ? now : new Date(formData.dataInizio);
-  
+
       const requestData = {
         itemId: formData.itemId,
         startNow: formData.startNow,
         dataInizio: formData.startNow ? null : dataInizio.toISOString(),
         dataFine: dataFine.toISOString()
       };
-  
+
       console.log("Dati formattati da inviare:", requestData); // Debug dati formattati
-  
+
       const response = await axios.post(
         "http://localhost:8080/api/aste",
         requestData,
         {
           params: { gestoreId: user.id },
-          headers: { 
+          headers: {
             Authorization: localStorage.getItem("sessionId"),
             'Content-Type': 'application/json'
           }
         }
       );
-  
+
       console.log("Risposta dal server:", response.data);
-  
+
       const itemsResponse = await axios.get(
         `http://localhost:8080/api/items/gestore/${user.id}`,
         { headers: { Authorization: localStorage.getItem("sessionId") } }
@@ -139,19 +141,25 @@ function GestoreItems() {
       setError(err.response?.data || "Errore nella creazione dell'asta");
     }
   };
-  
-  if (loading) return <div>Caricamento...</div>;
+
+  if (loading) return <div className="spinner-border" role="status">
+    <span className="sr-only">Caricamento...</span>
+  </div>
 
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <button
+          {/* <button
             onClick={() => navigate("/homepage")}
             className="text-blue-600 hover:text-blue-800"
           >
             ← Torna alla homepage
-          </button>
+          </button> */}
+          <a className="text-blue-600 hover:text-blue-800"
+            onClick={() => navigate("/homepage")}>
+            ← Torna alla lista
+          </a>
           <span>Gestore: {user?.username}</span>
         </div>
       </header>
@@ -159,7 +167,7 @@ function GestoreItems() {
       <main className="max-w-7xl mx-auto px-4 py-8">
         {/* Form creazione item */}
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-xl font-bold mb-4">Crea Nuovo Item</h2>
+          <h2 className="text-xl font-bold mb-4">Dettagli oggetto</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="text"
@@ -197,48 +205,48 @@ function GestoreItems() {
             </div>
 
             <div className="mb-4">
-                <label className="block mb-2">
-                  Immagine dell'oggetto
-                </label>
-                  <input
-                      type="file"
-                      onChange={async (e) => {
-                        const file = e.target.files[0];
-                        if (file) {
-                          const formData = new FormData();
-                          formData.append("file", file);
+              <label className="block mb-2">
+                Immagine dell'oggetto
+              </label>
+              <input
+                type="file"
+                onChange={async (e) => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const formData = new FormData();
+                    formData.append("file", file);
 
-                          try {
-                            const response = await axios.post(
-                                "http://localhost:8080/api/items/uploads",
-                                formData,
-                                {
-                                  headers: {
-                                    Authorization: localStorage.getItem("sessionId"),
-                                    'Content-Type': 'multipart/form-data'
-                                  }
-                                }
-                            );
-
-                            setNuovoItem(prev => ({
-                              ...prev,
-                                imageUrl: response.data
-                            }));
-                          } catch (err) {
-                            setError("Errore nel caricamento dell'immagine");
+                    try {
+                      const response = await axios.post(
+                        "http://localhost:8080/api/items/uploads",
+                        formData,
+                        {
+                          headers: {
+                            Authorization: localStorage.getItem("sessionId"),
+                            'Content-Type': 'multipart/form-data'
                           }
                         }
-                    }}
-                     
-                      className="w-full p-2 border rounded-lg bg-gray-200"
-                      accept="image/*"
-                    />
+                      );
+
+                      setNuovoItem(prev => ({
+                        ...prev,
+                        imageUrl: response.data
+                      }));
+                    } catch (err) {
+                      setError("Errore nel caricamento dell'immagine");
+                    }
+                  }
+                }}
+
+                className="w-full p-2 border rounded-lg bg-gray-200"
+                accept="image/*"
+              />
             </div>
             <button
               type="submit"
               className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
             >
-              Crea Item
+              Dettagli oggetto da mettere all'asta
             </button>
           </form>
           {error && <p className="text-red-500 mt-4">{error}</p>}
@@ -270,15 +278,15 @@ function GestoreItems() {
         </div>
 
         {showAstaForm && selectedItem && (
-  <CreateAstaForm
-    item={selectedItem}
-    onClose={() => {
-      setShowAstaForm(false);
-      setSelectedItem(null);
-    }}
-    onSubmit={handleCreaAsta}
-  />
-)}
+          <CreateAstaForm
+            item={selectedItem}
+            onClose={() => {
+              setShowAstaForm(false);
+              setSelectedItem(null);
+            }}
+            onSubmit={handleCreaAsta}
+          />
+        )}
       </main>
     </div>
   );

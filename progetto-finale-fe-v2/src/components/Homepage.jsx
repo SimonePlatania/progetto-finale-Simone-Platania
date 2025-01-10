@@ -6,6 +6,7 @@ import NotificationBell from "./NotificationBell";
 import CountDownTimer from "./CountdownTimer";
 import "../css/Flip.css";
 
+
 function Homepage() {
   const [user, setUser] = useState(null);
   const [asteAttive, setAsteAttive] = useState([]);
@@ -87,13 +88,14 @@ function Homepage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-xl text-gray-600">Caricamento...</div>
+      <div class="spinner-border" role="status">
+        <span class="sr-only">Caricamento...</span>
       </div>
     );
   }
 
   return (
+
     <div className="bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] min-h-screen h-full pb-12">
       {" "}
       {/* Header */}
@@ -111,7 +113,7 @@ function Homepage() {
                   onClick={() => navigate("/items")}
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                 >
-                  I Miei Items
+                  Archivio
                 </button>
               )}
 
@@ -169,9 +171,8 @@ function Homepage() {
             {asteAttive.map((asta) => (
               <div
                 key={asta.id}
-                className={`flip-card ${
-                  flippedCardId === asta.id ? "flipped" : ""
-                }`}
+                className={`flip-card ${flippedCardId === asta.id ? "flipped" : ""
+                  }`}
                 onClick={() =>
                   setFlippedCardId(flippedCardId === asta.id ? null : asta.id)
                 }
@@ -216,11 +217,10 @@ function Homepage() {
 
                       <div className="mt-4 text-center pb-4">
                         <span
-                          className={`inline-block px-3 py-1 rounded-full text-sm ${
-                            asta.startNow
+                          className={`inline-block px-3 py-1 rounded-full text-sm ${asta.startNow
                               ? "bg-green-100 text-green-800"
                               : "bg-yellow-100 text-yellow-800"
-                          }`}
+                            }`}
                         >
                           {asta.startNow ? "Asta Attiva" : "Inizio Programmato"}
                         </span>
@@ -284,11 +284,10 @@ function Homepage() {
                             e.stopPropagation();
                             navigate(`/asta/${asta.id}`);
                           }}
-                          className={`w-3/4 py-2.5 rounded-lg transition-colors ${
-                            asta.startNow
+                          className={`w-3/4 py-2.5 rounded-lg transition-colors ${asta.startNow
                               ? "bg-blue-600 hover:bg-blue-700 text-white"
                               : "bg-gray-100 text-gray-700"
-                          }`}
+                            }`}
                           disabled={
                             !asta.startNow && user?.ruolo === "PARTECIPANTE"
                           }
@@ -329,9 +328,8 @@ function Homepage() {
                     <div className="flex-grow flex items-center justify-center">
                       {items[asta.itemId]?.imageUrl ? (
                         <img
-                          src={`http://localhost:8080${
-                            items[asta.itemId].imageUrl
-                          }`}
+                          src={`http://localhost:8080${items[asta.itemId].imageUrl
+                            }`}
                           alt={asta.nomeItem}
                           className="max-w-full max-h-[250px] object-contain rounded-lg"
                         />
