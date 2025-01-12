@@ -15,11 +15,16 @@ function GestoreItems() {
     descrizione: "",
     prezzoBase: "",
     rilancioMinimo: "",
-    imageUrl: ""
+    imageUrl: "",
   });
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
+
+  const modifica = (itemId) => {
+    console.log("ID dell'item:", itemId); // Per debug
+    navigate(`/modifica/${itemId}`);
+  };
 
   useEffect(() => {
     const sessionId = localStorage.getItem("sessionId");
@@ -30,9 +35,12 @@ function GestoreItems() {
 
     const fetchData = async () => {
       try {
-        const userResponse = await axios.get("http://localhost:8080/api/utenti/me", {
-          headers: { Authorization: sessionId }
-        });
+        const userResponse = await axios.get(
+          "http://localhost:8080/api/utenti/me",
+          {
+            headers: { Authorization: sessionId },
+          }
+        );
         const userData = userResponse.data;
         setUser(userData);
 
@@ -65,11 +73,11 @@ function GestoreItems() {
         {
           ...nuovoItem,
           prezzoBase: parseFloat(nuovoItem.prezzoBase),
-          rilancioMinimo: parseFloat(nuovoItem.rilancioMinimo)
+          rilancioMinimo: parseFloat(nuovoItem.rilancioMinimo),
         },
         {
           params: { gestoreId: user.id },
-          headers: { Authorization: localStorage.getItem("sessionId") }
+          headers: { Authorization: localStorage.getItem("sessionId") },
         }
       );
 
@@ -78,7 +86,7 @@ function GestoreItems() {
         nome: "",
         descrizione: "",
         prezzoBase: "",
-        rilancioMinimo: ""
+        rilancioMinimo: "",
       });
       setError("");
     } catch (err) {
@@ -98,13 +106,15 @@ function GestoreItems() {
       // Creazione e formattazione corretta delle date
       const now = new Date();
       const dataFine = new Date(formData.dataFine);
-      const dataInizio = formData.startNow ? now : new Date(formData.dataInizio);
+      const dataInizio = formData.startNow
+        ? now
+        : new Date(formData.dataInizio);
 
       const requestData = {
         itemId: formData.itemId,
         startNow: formData.startNow,
         dataInizio: formData.startNow ? null : dataInizio.toISOString(),
-        dataFine: dataFine.toISOString()
+        dataFine: dataFine.toISOString(),
       };
 
       console.log("Dati formattati da inviare:", requestData); // Debug dati formattati
@@ -116,8 +126,8 @@ function GestoreItems() {
           params: { gestoreId: user.id },
           headers: {
             Authorization: localStorage.getItem("sessionId"),
-            'Content-Type': 'application/json'
-          }
+            "Content-Type": "application/json",
+          },
         }
       );
 
@@ -139,45 +149,57 @@ function GestoreItems() {
     }
   };
 
-  if (loading) return  <div className="flex justify-center items-center h-64">
-  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
-</div>
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          {/* <button
-            onClick={() => navigate("/homepage")}
-            className="text-blue-600 hover:text-blue-800"
-          >
-            ← Torna alla homepage
-          </button> */}
-          <a className="text-blue-600 hover:text-blue-800"
-            onClick={() => navigate("/homepage")}>
-            ← Torna alla lista
-          </a>
-          <span>Gestore: {user?.username}</span>
+    <div className="bg-gradient-to-br from-zinc-300/90 via-zinc-400/35 to-indigo-400/35 min-h-screen w-full overflow-x-hidden pb-24 rounded-lg">
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/30 border-b border-white/30 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex justify-between items-center">
+            <a
+              className="px-6 py-2.5 bg-white/20 hover:bg-white/30 text-green-700 rounded-full backdrop-blur-sm border border-white/30 shadow-sm transition-all hover:shadow-lg cursor-pointer"
+              onClick={() => navigate("/homepage")}
+            >
+              ← Torna indietro
+            </a>
+
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 font-semibold">
+              Gestore: {user?.username}
+            </span>
+          </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-8 py-12">
         {/* Form creazione item */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-xl font-bold mb-4">Dettagli oggetto</h2>
+        <div className="bg-white/60 backdrop-blur-md rounded-xl shadow-xl p-6 border border-white/50 mb-8">
+          <h2 className="text-xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+            Dettagli oggetto
+          </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="text"
               placeholder="Nome item"
               value={nuovoItem.nome}
-              onChange={(e) => setNuovoItem({ ...nuovoItem, nome: e.target.value })}
-              className="w-full p-2 border rounded-lg bg-gray-200"
+              onChange={(e) =>
+                setNuovoItem({ ...nuovoItem, nome: e.target.value })
+              }
+              className="w-full p-2.5 rounded-xl bg-white/50 border border-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
               required
             />
             <textarea
               placeholder="Descrizione"
               value={nuovoItem.descrizione}
-              onChange={(e) => setNuovoItem({ ...nuovoItem, descrizione: e.target.value })}
-              className="w-full p-2 border rounded-lg bg-gray-200"
+              onChange={(e) =>
+                setNuovoItem({ ...nuovoItem, descrizione: e.target.value })
+              }
+              className="w-full p-2.5 rounded-xl bg-white/50 border border-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-500 min-h-[100px]"
             />
             <div className="grid grid-cols-2 gap-4">
               <input
@@ -185,8 +207,10 @@ function GestoreItems() {
                 step="0.01"
                 placeholder="Prezzo base"
                 value={nuovoItem.prezzoBase}
-                onChange={(e) => setNuovoItem({ ...nuovoItem, prezzoBase: e.target.value })}
-                className="p-2 border rounded-lg bg-gray-200"
+                onChange={(e) =>
+                  setNuovoItem({ ...nuovoItem, prezzoBase: e.target.value })
+                }
+                className="p-2.5 rounded-xl bg-white/50 border border-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                 required
               />
               <input
@@ -194,14 +218,16 @@ function GestoreItems() {
                 step="0.01"
                 placeholder="Rilancio minimo"
                 value={nuovoItem.rilancioMinimo}
-                onChange={(e) => setNuovoItem({ ...nuovoItem, rilancioMinimo: e.target.value })}
-                className="p-2 border rounded-lg bg-gray-200"
+                onChange={(e) =>
+                  setNuovoItem({ ...nuovoItem, rilancioMinimo: e.target.value })
+                }
+                className="p-2.5 rounded-xl bg-white/50 border border-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                 required
               />
             </div>
 
-            <div className="mb-4">
-              <label className="block mb-2">
+            <div className="space-y-2">
+              <label className="block text-gray-700 font-medium">
                 Immagine dell'oggetto
               </label>
               <input
@@ -219,56 +245,96 @@ function GestoreItems() {
                         {
                           headers: {
                             Authorization: localStorage.getItem("sessionId"),
-                            'Content-Type': 'multipart/form-data'
-                          }
+                            "Content-Type": "multipart/form-data",
+                          },
                         }
                       );
 
-                      setNuovoItem(prev => ({
+                      setNuovoItem((prev) => ({
                         ...prev,
-                        imageUrl: response.data
+                        imageUrl: response.data,
                       }));
                     } catch (err) {
                       setError("Errore nel caricamento dell'immagine");
                     }
                   }
                 }}
-
-                className="w-full p-2 border rounded-lg bg-gray-200"
+                className="w-full p-2.5 rounded-xl bg-white/50 border border-white/50 backdrop-blur-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
                 accept="image/*"
               />
             </div>
+
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+              className="w-full py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl transition-all shadow-md hover:shadow-lg"
             >
               Inserisci oggetto nell'inventario
             </button>
           </form>
-          {error && <p className="text-red-500 mt-4">{error}</p>}
+          {error && (
+            <p className="mt-4 text-red-600 bg-red-50/50 backdrop-blur-sm p-2 rounded-lg">
+              {error}
+            </p>
+          )}
         </div>
 
         {/* Lista items */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 place-items-center">
           {items.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-lg font-semibold mb-2">{item.nome}</h3>
-              <p className="text-gray-600 mb-4">{item.descrizione}</p>
-              <div className="mb-4">
-                <p>Prezzo Base: €{item.prezzoBase?.toFixed(2)}</p>
-                <p>Rilancio Minimo: €{item.rilancioMinimo?.toFixed(2)}</p>
+            <div
+              key={item.id}
+              className="bg-white/60 backdrop-blur-md rounded-xl shadow-xl p-6 flex flex-col min-h-[400px] border border-white/50 w-full max-w-sm transform transition-all duration-300 hover:scale-105"
+            >
+              <div className="text-center mb-4">
+                <h3 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+                  {item.nome}
+                </h3>
               </div>
-              {!item.inAsta && (
-                <button
-                  onClick={() => handleCreateAstaClick(item)}
-                  className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
-                >
-                  Crea Asta
-                </button>
-              )}
-              {item.inAsta && (
-                <p className="text-center text-green-600 font-semibold">In Asta</p>
-              )}
+
+              <div className="border-t border-b border-gray-100/50 py-4 flex-grow">
+                <p className="text-gray-600 mb-4">{item.descrizione}</p>
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="bg-white/50 p-4 rounded-xl backdrop-blur-sm">
+                    <p className="text-gray-600 text-sm font-medium">
+                      Prezzo Base
+                    </p>
+                    <p className="text-lg font-semibold">
+                      €{item.prezzoBase?.toFixed(2)}
+                    </p>
+                  </div>
+                  <div className="bg-white/50 p-4 rounded-xl backdrop-blur-sm">
+                    <p className="text-gray-600 text-sm font-medium">
+                      Rilancio Minimo
+                    </p>
+                    <p className="text-lg font-semibold">
+                      €{item.rilancioMinimo?.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4">
+                {!item.inAsta ? (
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => handleCreateAstaClick(item)}
+                      className="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl transition-all shadow-md hover:shadow-lg"
+                    >
+                      Crea Asta
+                    </button>
+                    <button
+                      onClick={() => modifica(item.id)}
+                      className="w-full py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl transition-all shadow-md hover:shadow-lg"
+                    >
+                      Modifica
+                    </button>
+                  </div>
+                ) : (
+                  <div className="bg-emerald-50/80 backdrop-blur-sm p-3 rounded-xl text-emerald-600 font-semibold text-center">
+                    In Asta
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>

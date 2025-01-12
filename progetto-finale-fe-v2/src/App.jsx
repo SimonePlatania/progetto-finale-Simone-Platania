@@ -10,6 +10,7 @@ import AsteVinte from './components/AsteVinte';
 import AstePartecipate from './components/AstePartecipate';
 import GestoreItems from './components/GestoreItems';
 import ModificaProfilo from './components/ModificaProfilo';
+import ModificaItem from './components/ModificaItem';
 
 
 const router = createBrowserRouter([
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
   {
     path: "/registra-gestore",
     element: <RegistraGestore />
+  },
+  {
+    path: "/modifica/:itemId",
+    element: <ModificaItem />
   },
   {
     path: "/modifica-profilo",

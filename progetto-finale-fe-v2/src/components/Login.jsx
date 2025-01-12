@@ -70,7 +70,9 @@ function Login() {
   return (
     <div className="mio-div">
       <form className="form" onSubmit={handleSubmit}>
-        <h2 className="text-3xl font-bold text-center mb-8">Login</h2>
+        <h1 class="text-3xl font-bold text-transparent text-center bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+          Login
+        </h1>
         <br />
 
         {error && (

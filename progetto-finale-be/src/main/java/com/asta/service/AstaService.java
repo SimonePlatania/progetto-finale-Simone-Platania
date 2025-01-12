@@ -212,11 +212,9 @@ public class AstaService {
 			notificaService.inviaNotificaOffertaSuperata(astaId, asta.getOffertaCorrenteId(), importoOfferta);
 		}
 
-		if (asta.getOffertaCorrente() == null) {
-			LocalDateTime nuovaDataFine = now.plusMinutes(5);
-			asta.setDataFine(nuovaDataFine);
-			astaMapper.updateDataFine(asta);
-		}
+	    LocalDateTime nuovaDataFine = now.plusMinutes(5);
+	    asta.setDataFine(nuovaDataFine);
+	    astaMapper.updateDataFine(asta);
 
 		Offerta offerta = new Offerta();
 		offerta.setAstaId(astaId);

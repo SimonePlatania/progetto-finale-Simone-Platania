@@ -81,6 +81,16 @@
     transition: transform 0.5s ease;
   }
   
+  /* Aggiungere al tuo CSS esistente */
+.flip-card-front {
+  display: flex;
+  flex-direction: column;
+}
+
+.mt-auto {
+  margin-top: auto;
+}
+  
   /* Responsività */
   @media (max-width: 768px) {
     .flip-card-container {
@@ -92,3 +102,11 @@
       max-width: 350px;
     }
   }
+
+  .flip-card {
+    perspective: 1000px;
+    width: 350px;
+    height: 566px;
+    transition: all 0.3s ease;
+}
+

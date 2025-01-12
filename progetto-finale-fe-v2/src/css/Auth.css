@@ -2,8 +2,8 @@
 
 /* Design Tokens & Global Reset */
 :root {
-    --color-primary: #6366f1;
-    --color-secondary: #8b5cf6;
+    --color-primary: #6365f114;
+    --color-secondary: #8a5cf67a;
     --color-background: #f4f4fc;
     --color-text-dark: #1f2937;
     --color-text-light: #6b7280;
@@ -173,7 +173,7 @@ body {
 }
 
 .btn.registrati {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    background: linear-gradient(135deg, #8b5cf6, #ec4899);
     color: white;
     box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
 }

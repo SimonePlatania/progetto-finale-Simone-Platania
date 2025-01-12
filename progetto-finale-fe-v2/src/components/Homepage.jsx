@@ -1,11 +1,9 @@
-// Homepage.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import NotificationBell from "./NotificationBell";
 import CountDownTimer from "./CountdownTimer";
 import "../css/Flip.css";
-
 
 function Homepage() {
   const [user, setUser] = useState(null);
@@ -95,63 +93,58 @@ function Homepage() {
   }
 
   return (
-
-    <div className="bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] min-h-screen h-full pb-12">
-      {" "}
+    <div className="bg-gradient-to-br from-zinc-300/90 via-zinc-400/35 to-indigo-400/35 min-h-screen w-full overflow-x-hidden pb-24 rounded-lg">
       {/* Header */}
-      <header className="bg-white/90 backdrop-blur-md shadow rounded-md sticky top-0 z-50">
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-white/30 border-b border-white/30 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">Sistema Aste</h1>
+            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+              Sistema Aste
+            </h1>
 
             <div className="flex items-center space-x-4">
-              {/* Prima la campanella */}
               <NotificationBell userId={user?.id} />
-              {/* Navigazione per Gestore */}
               {user?.ruolo === "GESTORE" && (
                 <button
                   onClick={() => navigate("/items")}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-6 py-2.5 bg-white/20 hover:bg-white/30 text-purple-700 rounded-full backdrop-blur-sm border border-white/30 shadow-sm transition-all hover:shadow-lg"
                 >
                   Archivio
                 </button>
               )}
 
-              {/* Navigazione per Partecipante */}
               {user?.ruolo === "PARTECIPANTE" && (
                 <div className="flex space-x-3">
                   <button
                     onClick={() => navigate("/aste-partecipate")}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="px-6 py-2.5 bg-white/20 hover:bg-white/30 text-purple-700 rounded-full backdrop-blur-sm border border-white/30 shadow-sm transition-all hover:shadow-lg"
                   >
                     Partecipazioni
                   </button>
                   <button
                     onClick={() => navigate("/aste-vinte")}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    className="px-6 py-2.5 bg-white/20 hover:bg-white/30 text-green-700 rounded-full backdrop-blur-sm border border-white/30 shadow-sm transition-all hover:shadow-lg"
                   >
                     Aste Vinte
                   </button>
                 </div>
               )}
 
-              {/* Info Utente e Logout */}
-              <div className="flex items-center space-x-4 border-l pl-4">
+              <div className="flex items-center space-x-4 border-l border-white/30 pl-4">
                 <div
-                  className="text-center cursor-pointer"
+                  className="text-center cursor-pointer group"
                   onClick={modificaProfilo}
                 >
-                  <span className="block text-sm font-medium">Account</span>
-                  <span className="block text-xs text-gray-500">
-                    {user?.username}
-                  </span>
-                  <span className="block text-xs text-gray-600">
-                    {user?.ruolo}
-                  </span>
+                  <div className="transform transition-all group-hover:scale-105">
+                    <span className="block text-sm font-medium text-gray-700">{user?.username}</span>
+                    <span className="block text-xs text-gray-500">
+                      {user?.ruolo}
+                    </span>
+                  </div>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  className="px-6 py-2.5 bg-red-50 hover:bg-red-100 text-red-600 rounded-full backdrop-blur-sm border border-red-200 shadow-sm transition-all hover:shadow-lg"
                 >
                   Logout
                 </button>
@@ -160,8 +153,9 @@ function Homepage() {
           </div>
         </div>
       </header>
+
       {/* Contenuto Principale */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-8 py-12 flex-grow">
         {error ? (
           <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6">
             {error}
@@ -171,18 +165,19 @@ function Homepage() {
             {asteAttive.map((asta) => (
               <div
                 key={asta.id}
-                className={`flip-card ${flippedCardId === asta.id ? "flipped" : ""
-                  }`}
+                className={`flip-card ${flippedCardId === asta.id ? "flipped" : ""}`}
                 onClick={() =>
                   setFlippedCardId(flippedCardId === asta.id ? null : asta.id)
                 }
               >
                 <div className="flip-card-inner">
                   {/* FRONT DELLA CARD */}
-                  <div className="flip-card-front bg-white rounded-lg shadow-md p-6 flex flex-col min-h-[400px]">
+                  <div className="flip-card-front bg-white/60 backdrop-blur-md rounded-xl shadow-xl p-6 flex flex-col min-h-[400px] border border-white/50">
                     {/* HEADER CARD */}
                     <div className="text-center mb-4">
-                      <h3 className="text-xl font-semibold">{asta.nomeItem}</h3>
+                      <h3 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+                        {asta.nomeItem}
+                      </h3>
                       <div className="text-sm text-gray-500 mt-1">
                         <p>
                           ID Asta: {asta.id} • ID Item: {asta.itemId}
@@ -192,8 +187,8 @@ function Homepage() {
 
                     {/* Dettagli Principali */}
                     <div className="border-t border-b border-gray-100 py-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
-                        <div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-items-center">
+                        <div className="bg-white/50 p-4 rounded-xl backdrop-blur-sm">
                           <p className="text-md text-gray-600 pb-2">
                             Prezzo Base
                           </p>
@@ -203,11 +198,11 @@ function Homepage() {
                               "N/D"}
                           </p>
                         </div>
-                        <div>
-                          <p className="text-md text-gray-600 pb-2 pl-56">
+                        <div className="bg-white/50 p-4 rounded-xl backdrop-blur-sm">
+                          <p className="text-md text-gray-600 pb-2">
                             Offerta
                           </p>
-                          <p className="font-medium text-lg right pl-56">
+                          <p className="font-medium text-lg">
                             €
                             {asta.offertaCorrente?.toFixed(2) ||
                               "Nessuna offerta"}
@@ -229,7 +224,7 @@ function Homepage() {
 
                     {/* Info Offerente per Gestori */}
                     {user?.ruolo === "GESTORE" && asta.usernameOfferente && (
-                      <div className="mt-4 text-center bg-blue-50 p-3 rounded-lg">
+                      <div className="mt-4 text-center bg-white/50 p-3 rounded-xl backdrop-blur-sm">
                         <p className="text-sm text-gray-600">
                           Miglior Offerente
                         </p>
@@ -241,8 +236,8 @@ function Homepage() {
 
                     {/* Date e Azioni */}
                     <div className="mt-auto">
-                    <div className="text-sm text-gray-500 mb-4 flex-grow flex flex-col justify-center">
-                    {asta.startNow ? (
+                      <div className="text-sm text-gray-500 mb-4 flex-grow flex flex-col justify-center">
+                        {asta.startNow ? (
                           <>
                             <div className="space-y-2 mt-1 py-2 px-2 pb-6">
                               <p className="text-base italic">
@@ -282,10 +277,11 @@ function Homepage() {
                             e.stopPropagation();
                             navigate(`/asta/${asta.id}`);
                           }}
-                          className={`w-3/4 py-2.5 rounded-lg transition-colors ${asta.startNow
-                            ? "bg-blue-600 hover:bg-blue-700 text-white"
-                            : "bg-gray-100 text-gray-700"
-                            }`}
+                          className={`w-3/4 py-2.5 px-6 rounded-xl transition-all shadow-md hover:shadow-lg ${
+                            asta.startNow
+                              ? "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                              : "bg-white/50 backdrop-blur-sm text-gray-700"
+                          }`}
                           disabled={
                             !asta.startNow && user?.ruolo === "PARTECIPANTE"
                           }
@@ -301,7 +297,7 @@ function Homepage() {
                             e.stopPropagation();
                             setFlippedCardId(asta.id);
                           }}
-                          className="w-1/4 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-gray-700"
+                          className="w-1/4 py-2.5 bg-white/50 hover:bg-white/70 rounded-xl backdrop-blur-sm transition-all shadow-md hover:shadow-lg"
                         >
                           <span role="img" aria-label="flip">
                             🖼️
@@ -312,9 +308,9 @@ function Homepage() {
                   </div>
 
                   {/* RETRO DELLA CARD */}
-                  <div className="flip-card-back bg-gray-100 rounded-lg shadow-md p-6 flex flex-col min-h-[400px]">
+                  <div className="flip-card-back bg-white/60 backdrop-blur-md rounded-xl shadow-xl p-6 flex flex-col min-h-[400px] border border-white/50">
                     <div className="text-center mb-4">
-                      <h3 className="text-xl font-semibold">
+                      <h3 className="text-xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
                         {items[asta.itemId]?.nome || "Oggetto Sconosciuto"}
                       </h3>
                       <p className="text-gray-600 text-sm">
@@ -323,11 +319,10 @@ function Homepage() {
                       </p>
                     </div>
 
-                    <div className="flex-grow flex items-center justify-center">
+                    <div className="flex-grow flex items-center justify-center bg-white/50 p-4 rounded-xl backdrop-blur-sm">
                       {items[asta.itemId]?.imageUrl ? (
                         <img
-                          src={`http://localhost:8080${items[asta.itemId].imageUrl
-                            }`}
+                          src={`http://localhost:8080${items[asta.itemId].imageUrl}`}
                           alt={asta.nomeItem}
                           className="max-w-full max-h-[250px] object-contain rounded-lg"
                         />

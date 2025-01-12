@@ -7,7 +7,7 @@ const CountDownTimer = ({ targetDate }) => {
         secondi: 0
     });
 
-    const tempoTotaleSecondi = tempoRimanente.ore * 3600 + tempoRimanente.minuti * 60 + tempoRimanente.secondi;
+    const tempoTotaleSecondi = tempoRimanente.giorni * 86400 + tempoRimanente.ore * 3600 + tempoRimanente.minuti * 60 + tempoRimanente.secondi;
 
     const calcolaTempoRimanente = () => {
         const dataFinale = typeof targetDate === "string"
