@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import CountDownTimer from "./CountdownTimer";
-import 'bootstrap/dist/css/bootstrap.css'
 
 
 function AstaDettaglio() {
@@ -83,8 +82,8 @@ function AstaDettaglio() {
   if (isLoading || !user || !asta || !item) {
     return (
 
-      <div className="spinner-border" role="status">
-        <span className="sr-only">Caricamento...</span>
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
       </div>
     );
   }

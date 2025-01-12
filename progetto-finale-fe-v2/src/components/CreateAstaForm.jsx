@@ -1,6 +1,4 @@
 import { useState } from "react";
-import 'bootstrap/dist/css/bootstrap.css'
-
 
 function CreateAstaForm({ item, onClose, onSubmit }) {
   const [formData, setFormData] = useState({

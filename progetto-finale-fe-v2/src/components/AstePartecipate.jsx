@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import 'bootstrap/dist/css/bootstrap.css'
 
 
 function AstePartecipate() {
@@ -44,9 +43,9 @@ function AstePartecipate() {
     fetchData();
   }, [navigate]);
 
-  if (loading) return <div className="spinner-border" role="status">
-    <span className="sr-only">Caricamento...</span>
-  </div>;
+  if (loading) return  <div className="flex justify-center items-center h-64">
+  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
+</div>
 
   return (
     <div className="min-h-screen bg-gray-100 rounded-md">

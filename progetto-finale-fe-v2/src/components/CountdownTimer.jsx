@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import 'bootstrap/dist/css/bootstrap.css'
-
 
 const CountDownTimer = ({ targetDate }) => {
     const [tempoRimanente, setTempoRimanente] = useState({
@@ -20,13 +18,14 @@ const CountDownTimer = ({ targetDate }) => {
         const differenza = dataFinale.getTime() - adesso.getTime();
 
         if (differenza > 0) {
+            const giorni = Math.floor(differenza / (1000 * 60 * 60 * 24));
             const ore = Math.floor((differenza % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minuti = Math.floor((differenza % (1000 * 60 * 60)) / (1000 * 60));
             const secondi = Math.floor((differenza % (1000 * 60)) / 1000);
 
-            setTempoRimanente({ ore, minuti, secondi });
+            setTempoRimanente({ giorni, ore, minuti, secondi });
         } else {
-            setTempoRimanente({ ore: 0, minuti: 0, secondi: 0 });
+            setTempoRimanente({ giorni: 0, ore: 0, minuti: 0, secondi: 0 });
         }
     };
 

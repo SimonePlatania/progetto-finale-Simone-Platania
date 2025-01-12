@@ -3,9 +3,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import CreateAstaForm from "./CreateAstaForm";
-import 'bootstrap/dist/css/bootstrap.css'
-
-
 
 function GestoreItems() {
   const [user, setUser] = useState(null);
@@ -142,10 +139,9 @@ function GestoreItems() {
     }
   };
 
-  if (loading) return <div className="spinner-border" role="status">
-    <span className="sr-only">Caricamento...</span>
-  </div>
-
+  if (loading) return  <div className="flex justify-center items-center h-64">
+  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
+</div>
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-white shadow">
@@ -246,7 +242,7 @@ function GestoreItems() {
               type="submit"
               className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
             >
-              Dettagli oggetto da mettere all'asta
+              Inserisci oggetto nell'inventario
             </button>
           </form>
           {error && <p className="text-red-500 mt-4">{error}</p>}

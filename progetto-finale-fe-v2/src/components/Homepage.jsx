@@ -88,8 +88,8 @@ function Homepage() {
 
   if (loading) {
     return (
-      <div class="spinner-border" role="status">
-        <span class="sr-only">Caricamento...</span>
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
       </div>
     );
   }
@@ -124,7 +124,7 @@ function Homepage() {
                     onClick={() => navigate("/aste-partecipate")}
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                   >
-                    Le Mie Aste
+                    Partecipazioni
                   </button>
                   <button
                     onClick={() => navigate("/aste-vinte")}
@@ -218,8 +218,8 @@ function Homepage() {
                       <div className="mt-4 text-center pb-4">
                         <span
                           className={`inline-block px-3 py-1 rounded-full text-sm ${asta.startNow
-                              ? "bg-green-100 text-green-800"
-                              : "bg-yellow-100 text-yellow-800"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
                             }`}
                         >
                           {asta.startNow ? "Asta Attiva" : "Inizio Programmato"}
@@ -241,8 +241,8 @@ function Homepage() {
 
                     {/* Date e Azioni */}
                     <div className="mt-auto">
-                      <div className="text-sm text-gray-500 mb-4">
-                        {asta.startNow ? (
+                    <div className="text-sm text-gray-500 mb-4 flex-grow flex flex-col justify-center">
+                    {asta.startNow ? (
                           <>
                             <div className="space-y-2 mt-1 py-2 px-2 pb-6">
                               <p className="text-base italic">
@@ -252,27 +252,25 @@ function Homepage() {
                             </div>
                             <p className="pr-6 py-4">Tempo rimanente:</p>
 
-                            <div className="items-center pl-20 ">
+                            <div className="flex justify-center">
                               <CountDownTimer targetDate={asta.dataFine} />
                             </div>
                           </>
                         ) : (
                           <>
-                            <div className="space-y-2">
-                              <p>
-                                Inizia il:{" "}
-                                {new Date(asta.dataInizio).toLocaleString()}
-                              </p>
-                              <p>Tempo all'inizio:</p>
-                              <CountDownTimer targetDate={asta.dataInizio} />
+                            <div className="space-y-2 mb-4">
+                              <p>Inizia il: {new Date(asta.dataInizio).toLocaleString()}</p>
+                              <p className="text-center">Tempo all'inizio:</p>
+                              <div className="flex justify-center">
+                                <CountDownTimer targetDate={asta.dataInizio} />
+                              </div>
                             </div>
-                            <div className="mt-4 space-y-2">
-                              <p>
-                                Termina il:{" "}
-                                {new Date(asta.dataFine).toLocaleString()}
-                              </p>
-                              <p>Tempo alla fine:</p>
-                              <CountDownTimer targetDate={asta.dataFine} />
+                            <div className="space-y-2">
+                              <p>Termina il: {new Date(asta.dataFine).toLocaleString()}</p>
+                              <p className="text-center">Tempo alla fine:</p>
+                              <div className="flex justify-center">
+                                <CountDownTimer targetDate={asta.dataFine} />
+                              </div>
                             </div>
                           </>
                         )}
@@ -285,8 +283,8 @@ function Homepage() {
                             navigate(`/asta/${asta.id}`);
                           }}
                           className={`w-3/4 py-2.5 rounded-lg transition-colors ${asta.startNow
-                              ? "bg-blue-600 hover:bg-blue-700 text-white"
-                              : "bg-gray-100 text-gray-700"
+                            ? "bg-blue-600 hover:bg-blue-700 text-white"
+                            : "bg-gray-100 text-gray-700"
                             }`}
                           disabled={
                             !asta.startNow && user?.ruolo === "PARTECIPANTE"
