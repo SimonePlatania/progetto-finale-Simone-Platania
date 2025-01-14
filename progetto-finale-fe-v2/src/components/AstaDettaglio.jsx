@@ -396,9 +396,6 @@ function AstaDettaglio() {
                     {new Date(offerta.dataOfferta).toLocaleString()}
                   </span>
                 </div>
-
-                
-            
               ))}
             </div>
           </div>

@@ -59,6 +59,7 @@ function Login() {
       localStorage.setItem("sessionId", response.data.sessionId);
       localStorage.setItem("user", JSON.stringify(response.data.utente));
 
+      //02/01/25 LO UTILIZZO PER IMPOSTARE UN TOKEN E MEMORIZZARLO PER LE RICHIESTE FUTURE
       axios.defaults.headers.common["Authorization"] = response.data.sessionId;
       navigate("/homepage");
     } catch (err) {
