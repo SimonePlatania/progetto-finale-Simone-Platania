@@ -30,7 +30,9 @@ function CreateAstaForm({ item, onClose, onSubmit }) {
 
         <div className="mb-6">
           <div className="bg-white/50 p-4 rounded-xl backdrop-blur-sm">
-            <h4 className="font-semibold text-gray-700 mb-2">Dettagli Oggetto</h4>
+            <h4 className="font-semibold text-gray-700 mb-2">
+              Dettagli Oggetto
+            </h4>
             <p className="text-gray-600">{item.nome}</p>
             <p className="text-sm text-gray-500 mt-1">ID: {item.id}</p>
           </div>

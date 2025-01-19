@@ -10,6 +10,7 @@ import {
   Ban,
   Info,
   PlusCircle,
+  AlarmClockOff
 } from "lucide-react";
 
 const TIPI_NOTIFICA = {
@@ -70,7 +71,7 @@ const NotificationBell = ({ userId }) => {
         borderColor: "border-yellow-100"
       },
       [TIPI_NOTIFICA.ASTA_TERMINATA]: {
-        icon: <Ban className="w-5 h-5 text-red-500" />,
+        icon: <AlarmClockOff className="w-5 h-5 text-red-500" />,
         bgColor: "bg-red-50",
         borderColor: "border-red-100"
       },

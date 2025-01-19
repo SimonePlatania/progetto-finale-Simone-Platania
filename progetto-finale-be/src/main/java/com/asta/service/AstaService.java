@@ -333,6 +333,11 @@ public class AstaService {
 
 	// 28/12/2024 Simone SERVICE PER RITROVARE LE ASTE CHE SONO STATE VINTE 6)
 	public List<Asta> getAsteVinte(Long userId) {
+		
+		Utente utente = utenteMapper.findById(userId);
+		if (utente == null) {
+			throw new RuntimeException("Utente non trovato" +userId);
+		}
 		return astaMapper.findAsteVinte(userId);
 	}
 

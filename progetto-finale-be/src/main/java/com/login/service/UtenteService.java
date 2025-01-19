@@ -102,7 +102,6 @@ public class UtenteService {
 	    // MI SERVE LA CREAZIONE DI UN SESSION ID UNICO AD OGNI LOGIN
 	    String sessionId = UUID.randomUUID().toString();
 	    
-	    // UTILE PER SALVARE LA SESSIONE NEL DB
 	    try {
 	        utenteMapper.insertSessione(sessionId, utente.getId(), LocalDateTime.now(), LocalDateTime.now());
 	        logger.info("Sessione creata con successo per l'utente: {}", utente.getUsername());
